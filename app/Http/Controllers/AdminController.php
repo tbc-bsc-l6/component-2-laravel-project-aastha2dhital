@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class AdminController extends Controller
 {
@@ -14,9 +15,13 @@ class AdminController extends Controller
 
     // List all teachers
     public function teachers()
-    {
-        return 'Teachers Page';
-    }
+{
+    $teachers = User::whereHas('role', function ($query) {
+        $query->where('name', 'teacher');
+    })->get();
+
+    return view('admin.teachers', compact('teachers'));
+}
 
     // List all modules
     public function modules()
