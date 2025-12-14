@@ -6,7 +6,7 @@ use App\Http\Controllers\AdminController;
 Route::get('/admin', [AdminController::class, 'dashboard']);
 
 // Show all teachers
-Route::get('/admin/teachers', [AdminController::class, 'teachers'])->name('admin.teachers');
+Route::get('/admin/teachers', [AdminController::class, 'teachers']);
 
 // Show all modules
 Route::get('/admin/modules', [AdminController::class, 'modules'])->name('admin.modules');

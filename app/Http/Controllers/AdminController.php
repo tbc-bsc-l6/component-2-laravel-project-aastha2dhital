@@ -15,7 +15,7 @@ class AdminController extends Controller
     // List all teachers
     public function teachers()
     {
-        return view('admin.teachers');
+        return 'Teachers Page';
     }
 
     // List all modules
