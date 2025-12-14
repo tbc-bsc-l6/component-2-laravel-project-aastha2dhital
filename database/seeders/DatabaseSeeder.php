@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,6 +15,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSEeder::class);
 
         // Seed admin user (ONLY created through seeder)
-        @this->call(AdminSeeder::class);
+        $this->call(AdminSeeder::class);
     }
 }
