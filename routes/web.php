@@ -7,6 +7,9 @@ Route::get('/admin', [AdminController::class, 'dashboard']);
 
 // Show all teachers
 Route::get('/admin/teachers', [AdminController::class, 'teachers']);
+Route::get('/admin/teachers/create', [AdminController::class, 'createTeacher']);
+Route::post('/admin/teachers', [AdminController::class, 'storeTeacher']);
+Route::delete('/admin/teachers/{id}', [AdminController::class, 'deleteTeacher']);
 
 // Show all modules
 Route::get('/admin/modules', [AdminController::class, 'modules'])->name('admin.modules');
