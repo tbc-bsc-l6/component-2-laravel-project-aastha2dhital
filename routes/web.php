@@ -3,7 +3,7 @@
 use App\Http\Controllers\AdminController;
 
 // Admin Dashboard
-Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin', [AdminController::class, 'dashboard']);
 
 // Show all teachers
 Route::get('/admin/teachers', [AdminController::class, 'teachers'])->name('admin.teachers');

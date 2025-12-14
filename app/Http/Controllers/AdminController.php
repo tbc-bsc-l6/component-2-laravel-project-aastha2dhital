@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 class AdminController extends Controller
 {
      // Admin dashboard
-    public function index()
+    public function dashboard()
     {
-        return view('admin.dashboard');
+       return view('admin.dashboard');
     }
 
     // List all teachers
