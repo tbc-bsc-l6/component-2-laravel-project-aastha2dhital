@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('module_user', function (Blueprint $table) {
             $table->id();
 
-            // Student enrolled
+            // Student ID
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            // Module enrolled into
+            // Module ID
             $table->unsignedBigInteger('module_id');
             $table->foreign('module_id')->references('id')->on('modules')->onDelete('cascade');
 
