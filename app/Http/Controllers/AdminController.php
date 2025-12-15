@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Module;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +26,7 @@ class AdminController extends Controller
         return view('admin.teachers', compact('teachers'));
     }
 
-    // Show create teacher page (form will come next)
+    // Show create teacher page 
     public function createTeacher()
     {
           return view('admin.create-teacher');
@@ -59,9 +60,29 @@ class AdminController extends Controller
     return redirect('/admin/teachers');
     }
 
-    // List all modules (placeholder for now)
+    // List all modules
     public function modules()
     {
-        return view('admin.modules');
+        $modules = Module::all();
+        return view('admin.modules', compact('modules'));
     }
+    public function createModule()
+    {
+    return view('admin.create-module');
+    }
+
+    public function storeModule(Request $request)
+    {
+    $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
+
+    Module::create([
+        'name' => $request->name,
+    ]);
+
+    return redirect('/admin/modules');
+    }
+
+
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 
 // Admin Dashboard
@@ -12,7 +13,9 @@ Route::post('/admin/teachers', [AdminController::class, 'storeTeacher']);
 Route::delete('/admin/teachers/{id}', [AdminController::class, 'deleteTeacher']);
 
 // Show all modules
-Route::get('/admin/modules', [AdminController::class, 'modules'])->name('admin.modules');
+Route::get('/admin/modules', [AdminController::class, 'modules']);
+Route::get('/admin/modules/create', [AdminController::class, 'createModule']);
+Route::post('/admin/modules', [AdminController::class, 'storeModule']);
 
 // Assign teacher to module 
 Route::get('/admin/modules/{module}/assign', [AdminController::class, 'assignTeacherForm'])->name('admin.assign.form');
