@@ -2,37 +2,75 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\TeacherController;
 
-// Admin Dashboard
-Route::get('/admin', [AdminController::class, 'dashboard']);
-// Enroll students into modules
-Route::get('/admin/modules/{module}/enroll', [AdminController::class, 'enrollStudentForm'])
-    ->name('admin.modules.enroll');
-Route::post('/admin/modules/{module}/enroll', [AdminController::class, 'enrollStudent']);
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+
+    // Admin Dashboard
+    Route::get('/', [AdminController::class, 'dashboard'])
+        ->name('admin.dashboard');
+
+    // Show all modules
+    Route::get('/modules', [AdminController::class, 'modules'])
+        ->name('admin.modules.index');
+
+    // Create module
+    Route::get('/modules/create', [AdminController::class, 'createModule'])
+        ->name('admin.modules.create');
+
+    Route::post('/modules', [AdminController::class, 'storeModule'])
+        ->name('admin.modules.store');
+
+    // Enroll students into module
+    Route::get('/modules/{module}/enroll', [AdminController::class, 'enrollStudentForm'])
+        ->name('admin.modules.enroll.form');
+
+    Route::post('/modules/{module}/enroll', [AdminController::class, 'enrollStudent'])
+        ->name('admin.modules.enroll.store');
+
+    // Assign teacher to module
+    Route::get('/modules/{module}/assign', [AdminController::class, 'assignTeacherForm'])
+        ->name('admin.modules.assign.form');
+
+    Route::post('/modules/{module}/assign', [AdminController::class, 'assignTeacher'])
+        ->name('admin.modules.assign.store');
+
+    // Show all teachers
+    Route::get('/teachers', [AdminController::class, 'teachers'])
+        ->name('admin.teachers.index');
+
+    // Create teacher
+    Route::get('/teachers/create', [AdminController::class, 'createTeacher'])
+        ->name('admin.teachers.create');
+
+    Route::post('/teachers', [AdminController::class, 'storeTeacher'])
+        ->name('admin.teachers.store');
+
+    // Delete teacher
+    Route::delete('/teachers/{id}', [AdminController::class, 'deleteTeacher'])
+        ->name('admin.teachers.delete');
+});
+
+// Teacher Routes
+Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->group(function () {
+
+    // Teacher Dashboard
+    Route::get('/dashboard', [TeacherController::class, 'dashboard'])
+        ->name('teacher.dashboard');
+
+    // View assigned modules
+    Route::get('/modules', [TeacherController::class, 'modules'])
+        ->name('teacher.modules');
+
+    // View students in a module
+    Route::get('/modules/{module}/students', [TeacherController::class, 'students'])
+        ->name('teacher.modules.students');
+});
 
 
-// Show all teachers
-Route::get('/admin/teachers', [AdminController::class, 'teachers']);
-Route::get('/admin/teachers/create', [AdminController::class, 'createTeacher']);
-Route::post('/admin/teachers', [AdminController::class, 'storeTeacher']);
-Route::delete('/admin/teachers/{id}', [AdminController::class, 'deleteTeacher']);
+// Student Routes
+Route::middleware(['auth'])->group(function () {
 
-// Show all modules
-Route::get('/admin/modules', [AdminController::class, 'modules'])
- ->name('admin.modules.index');
-Route::get('/admin/modules/create', [AdminController::class, 'createModule']);
-Route::post('/admin/modules', [AdminController::class, 'storeModule']);
-
-// Assign teacher to module 
-Route::get('/admin/modules/{module}/assign', [AdminController::class, 'assignTeacherForm'])->name('admin.assign.form');
-
-// Assign teacher to module
-Route::post('/admin/modules/{module}/assign', [AdminController::class, 'assignTeacher'])->name('admin.assign.submit');
-
-// Toggle module availability
-// Route::post('/admin/modules/{module}/toggle', [AdminController::class, 'toggleAvailability'])->name('admin.toggle');
-
-// Student dashboard
-Route::get('/student/dashboard', [AdminController::class, 'studentDashboard'])
-    ->name('student.dashboard');
-
+    Route::get('/student/dashboard', [AdminController::class, 'studentDashboard'])
+        ->name('student.dashboard');
+});

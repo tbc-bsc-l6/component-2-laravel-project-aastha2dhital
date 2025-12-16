@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Seed user roles (admin, teacher, student, old_student)
-        $this->call(RoleSEeder::class);
+        $this->call(RoleSeeder::class);
 
         // Seed admin user (ONLY created through seeder)
         $this->call(AdminSeeder::class);

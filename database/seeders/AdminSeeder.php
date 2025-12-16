@@ -18,11 +18,13 @@ class AdminSeeder extends Seeder
         $adminRoleId = DB::table('user_roles')->where('name', 'admin')->value('id');
 
         //Create the admin user 
-        User::create([
-            'name' => 'Aastha',
-            'email' => 'daastha29@gmail.com',
-            'password' => Hash::make('hahabye123@'),
-            'user_role_id' => $adminRoleId,
-        ]);
+        User::firstOrCreate(
+    ['email' => 'daastha29@gmail.com'],
+    [
+        'name' => 'Aastha',
+        'password' => Hash::make('hahabye123@'),
+        'user_role_id' => $adminRoleId,
+    ]
+);
     }
 }

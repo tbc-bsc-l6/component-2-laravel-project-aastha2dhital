@@ -1,23 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>My Enrolled Modules</h1>
+@section('title', 'Student Dashboard')
 
-    @if($modules->isEmpty())
-        <p>You are not enrolled in any modules yet.</p>
-    @else
-        <ul>
-            @foreach($modules as $module)
-                <li>
-                    {{ $module->name }}
-                </li>
-            @endforeach
-        </ul>
-    @endif
+@section('content')
 
-</body>
-</html>
+<h2 class="text-3xl font-bold mb-4">My Enrolled Modules</h2>
+
+@if($modules->isEmpty())
+    <p class="text-gray-600">You are not enrolled in any modules yet.</p>
+@else
+    <ul class="space-y-2">
+        @foreach($modules as $module)
+            <li class="bg-white border p-4 rounded">
+                {{ $module->name }}
+            </li>
+        @endforeach
+    </ul>
+@endif
+
+@endsection
