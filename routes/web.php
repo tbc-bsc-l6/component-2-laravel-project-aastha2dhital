@@ -30,5 +30,9 @@ Route::get('/admin/modules/{module}/assign', [AdminController::class, 'assignTea
 Route::post('/admin/modules/{module}/assign', [AdminController::class, 'assignTeacher'])->name('admin.assign.submit');
 
 // Toggle module availability
-Route::post('/admin/modules/{module}/toggle', [AdminController::class, 'toggleAvailability'])->name('admin.toggle');
+// Route::post('/admin/modules/{module}/toggle', [AdminController::class, 'toggleAvailability'])->name('admin.toggle');
+
+// Student dashboard
+Route::get('/student/dashboard', [AdminController::class, 'studentDashboard'])
+    ->name('student.dashboard');
 

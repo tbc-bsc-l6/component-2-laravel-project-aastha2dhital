@@ -138,4 +138,20 @@ class AdminController extends Controller
             ->back()
             ->with('success', 'Student enrolled successfully.');
     }
-}
+    // Student dashboard - view enrolled modules
+    public function studentDashboard()
+    {
+    // TEMPORARY: get first student for demo purposes
+    $student = User::whereHas('role', function ($q) {
+        $q->where('name', 'student');
+    })->first();
+
+    if (!$student) {
+        return "No student found in database.";
+    }
+
+    $modules = $student->modules;
+
+    return view('student.dashboard', compact('modules'));
+    }
+}  
