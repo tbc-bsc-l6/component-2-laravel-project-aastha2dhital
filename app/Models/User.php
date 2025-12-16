@@ -55,6 +55,8 @@ class User extends Authenticatable
     public function modules()
     {
         return $this->belongsToMany(Module::class, 'module_user')
+                    ->withPivot('status', 'completed_at')
                     ->withTimestamps();
     }
 }
+

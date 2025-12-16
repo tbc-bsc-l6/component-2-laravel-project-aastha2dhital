@@ -26,6 +26,7 @@ class Module extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'module_user')
+                     ->withPivot('status', 'completed_at')
                      ->withTimestamps();
     }
 }

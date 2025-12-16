@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 
 use Illuminate\Http\Request;
 
@@ -19,8 +21,26 @@ class TeacherController extends Controller
     }
 
     // View students in a module
-    public function students($module)
+    public function students(Module $module)
     {
-        return view('teacher.students');
+       $module->load('students');
+       return view('teacher.students', compact('module'));
     }
+
+    public function setResult(Request $request, Module $module, User $student)
+{
+    $request->validate([
+        'status' => 'required|in:PASS,FAIL',
+    ]);
+
+    $module->students()->updateExistingPivot(
+        $student->id,
+        [
+            'status' => $request->status,
+            'completed_at' => Carbon::now(),
+        ]
+    );
+
+    return back()->with('success', 'Result updated successfully.');
+}
 }
