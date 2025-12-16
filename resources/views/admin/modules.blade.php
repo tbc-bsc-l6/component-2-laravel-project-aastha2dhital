@@ -4,6 +4,16 @@
 
 <ul>
 @foreach($modules as $module)
-    <li>{{ $module->name }}</li>
+    <li>
+            {{ $module->name }}
+
+            | <a href="/admin/modules/{{ $module->id }}/assign">
+                Assign Teacher
+              </a>
+
+            | <a href="/admin/modules/{{ $module->id }}/enroll">
+                Enroll Student
+              </a>
+        </li>
 @endforeach
 </ul>

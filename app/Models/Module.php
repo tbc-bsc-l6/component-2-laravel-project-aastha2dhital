@@ -26,7 +26,6 @@ class Module extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'module_user')
-                    ->withPivot(['enrolled_at', 'completed_at', 'status', 'teacher_id'])
-                    ->withTimestamps();
+                     ->withTimestamps();
     }
 }

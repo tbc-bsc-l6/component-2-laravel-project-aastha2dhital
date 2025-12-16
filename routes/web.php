@@ -5,6 +5,11 @@ use App\Http\Controllers\AdminController;
 
 // Admin Dashboard
 Route::get('/admin', [AdminController::class, 'dashboard']);
+// Enroll students into modules
+Route::get('/admin/modules/{module}/enroll', [AdminController::class, 'enrollStudentForm'])
+    ->name('admin.modules.enroll');
+Route::post('/admin/modules/{module}/enroll', [AdminController::class, 'enrollStudent']);
+
 
 // Show all teachers
 Route::get('/admin/teachers', [AdminController::class, 'teachers']);
@@ -13,7 +18,8 @@ Route::post('/admin/teachers', [AdminController::class, 'storeTeacher']);
 Route::delete('/admin/teachers/{id}', [AdminController::class, 'deleteTeacher']);
 
 // Show all modules
-Route::get('/admin/modules', [AdminController::class, 'modules']);
+Route::get('/admin/modules', [AdminController::class, 'modules'])
+ ->name('admin.modules.index');
 Route::get('/admin/modules/create', [AdminController::class, 'createModule']);
 Route::post('/admin/modules', [AdminController::class, 'storeModule']);
 
