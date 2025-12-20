@@ -26,8 +26,10 @@ Route::get('/teacher/dashboard', function () {
 })->name('teacher.dashboard');
 
 Route::get('/student/dashboard', function () {
-    return 'Student Dashboard';
-})->name('student.dashboard');
+    return view('student.dashboard', [
+        'modules' => auth()->user()->modules
+    ]);
+})->middleware('auth')->name('student.dashboard');
 
 Route::get('/old-student/dashboard', function () {
     return 'Old Student Dashboard';
