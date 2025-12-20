@@ -131,17 +131,35 @@ class AdminController extends Controller
         $request->validate([
             'student_id' => 'required|exists:users,id',
         ]);
+        $student = User::findOrFail($request->student_id);
 
-        $module->students()->syncWithoutDetaching($request->student_id);
-
-        return redirect()
-            ->back()
-            ->with('success', 'Student enrolled successfully.');
+    // Module can have max 10 students
+    if ($module->students()->count() >= 10) {
+        return back()->with('error', 'This module already has 10 students.');
     }
+
+    // Student can enrol in max 4 modules
+    if ($student->modules()->count() >= 4) {
+        return back()->with('error', 'This student is already enrolled in 4 modules.');
+    }
+
+    // Prevent duplicate enrolment
+    if ($module->students()->where('user_id', $student->id)->exists()) {
+        return back()->with('error', 'Student is already enrolled in this module.');
+    }
+
+    // Enrol student
+    $module->students()->attach($student->id);
+
+    return redirect()
+        ->back()
+        ->with('success', 'Student enrolled successfully.');
+    
+    }
+
     // Student dashboard - view enrolled modules
     public function studentDashboard()
     {
-    // TEMPORARY: get first student for demo purposes
     $student = User::whereHas('role', function ($q) {
         $q->where('name', 'student');
     })->first();

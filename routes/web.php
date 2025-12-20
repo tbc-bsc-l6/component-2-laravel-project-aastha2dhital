@@ -17,4 +17,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/admin/dashboard', function () {
+    return 'Admin Dashboard';
+})->name('admin.dashboard');
+
+Route::get('/teacher/dashboard', function () {
+    return 'Teacher Dashboard';
+})->name('teacher.dashboard');
+
+Route::get('/student/dashboard', function () {
+    return 'Student Dashboard';
+})->name('student.dashboard');
+
+Route::get('/old-student/dashboard', function () {
+    return 'Old Student Dashboard';
+})->name('old-student.dashboard');
+
 require __DIR__.'/auth.php';
