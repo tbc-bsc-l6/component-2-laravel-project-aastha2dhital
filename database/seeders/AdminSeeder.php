@@ -15,16 +15,15 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         //Get admin role ID
-        $adminRoleId = DB::table('user_roles')->where('name', 'admin')->value('id');
+        $adminRoleId = DB::table('user_roles')->where('role', 'admin')->value('id');
 
         //Create the admin user 
-        User::firstOrCreate(
-    ['email' => 'daastha29@gmail.com'],
-    [
-        'name' => 'Aastha',
-        'password' => Hash::make('hahabye123@'),
-        'user_role_id' => $adminRoleId,
-    ]
-);
+        User::create([
+            'name' => 'Admin',
+            'email' => 'daastha29@gmail.com',
+            'password' => Hash::make('password'),
+            'user_role_id' => $adminRoleId,
+]);
+
     }
 }
