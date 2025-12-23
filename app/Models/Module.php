@@ -11,22 +11,20 @@ class Module extends Model
 
     protected $fillable = [
         'name',
-        'description',
-        'is_available',
-        'teacher_id'
+        'teacher_id',
     ];
 
-     // The teacher assigned to this module
+    // Module belongs to a teacher
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    // Students enrolled in this module
+    // Module has many students
     public function students()
     {
         return $this->belongsToMany(User::class, 'module_user')
-                     ->withPivot('status', 'completed_at')
-                     ->withTimestamps();
+                    ->withPivot('status', 'completed_at')
+                    ->withTimestamps();
     }
 }

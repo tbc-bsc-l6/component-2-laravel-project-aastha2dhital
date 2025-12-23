@@ -15,10 +15,10 @@
                 </p>
 
                 <div class="mt-4">
-                    <button
-                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-700 transition">
+                    <a href="{{ route('student.modules.index') }}"
+                       class="inline-flex items-center px-4 py-2 bg-indigo-600 rounded-md font-semibold text-white hover:bg-indigo-700 transition">
                         View Available Modules
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -30,7 +30,7 @@
                     </p>
 
                     <p class="text-3xl font-bold text-gray-800 mt-1">
-                        {{ $modules->count() }}
+                        {{ auth()->user()->modules->count() }}
                     </p>
                 </div>
             </div>
@@ -41,20 +41,20 @@
                     My Enrolled Modules
                 </h3>
 
-                @if($modules->isEmpty())
+                @if(auth()->user()->modules->isEmpty())
                     <p class="text-gray-600">
                         You are not enrolled in any modules yet.
                     </p>
                 @else
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($modules as $module)
+                        @foreach(auth()->user()->modules as $module)
                             <div class="border rounded-lg p-5 hover:shadow-md transition">
                                 <h4 class="text-lg font-semibold text-gray-800">
                                     {{ $module->name }}
                                 </h4>
 
                                 <p class="text-sm text-gray-600 mt-1">
-                                    Module enrolled
+                                    Enrolled
                                 </p>
                             </div>
                         @endforeach

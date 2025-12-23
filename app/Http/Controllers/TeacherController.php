@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
@@ -16,9 +16,13 @@ class TeacherController extends Controller
 
     // View modules assigned to teacher
     public function modules()
-    {
-        return view('teacher.modules');
-    }
+{
+    $teacher = Auth::user();
+
+    $modules = $teacher->modules; // relationship
+
+    return view('teacher.modules', compact('modules'));
+}
 
     // View students in a module
     public function students(Module $module)
