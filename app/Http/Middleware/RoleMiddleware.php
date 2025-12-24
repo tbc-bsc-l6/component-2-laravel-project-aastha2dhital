@@ -7,14 +7,16 @@ use Illuminate\Http\Request;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $role)
+    public function handle(Request $request, Closure $next, $role)
     {
         if (!auth()->check()) {
-            return redirect()->route('login');
+            abort(403);
         }
 
-        if (!auth()->user()->role || auth()->user()->role->name !== $role) {
-            return redirect()->route('dashboard');
+        $user = auth()->user();
+
+        if (!$user->role || $user->role->role !== $role) {
+            abort(403);
         }
 
         return $next($request);

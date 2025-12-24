@@ -36,7 +36,7 @@ class User extends Authenticatable
     // Each user belongs to a role (admin, teacher, student, old_student)
     public function role()
     {
-        return $this->belongsTo(UserRole::class, 'user_role_id');
+        return $this->belongsTo(\App\Models\UserRole::class, 'user_role_id');
     }
 
     // A teacher teaches many modules

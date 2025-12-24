@@ -14,7 +14,7 @@
 
 <div class="flex min-h-screen">
 
-    {{-- ================= Sidebar ================= --}}
+    {{-- Sidebar  --}}
     <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
 
         {{-- Logo / Title --}}
@@ -31,8 +31,9 @@
                 Dashboard
             </a>
 
-            <a href="#"
-               class="block px-4 py-2 rounded hover:bg-gray-800">
+            <a href="{{ route('admin.modules.index') }}"
+               class="block px-4 py-2 rounded
+               {{ request()->routeIs('admin.modules.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
                 Modules
             </a>
 
@@ -61,8 +62,9 @@
 
     </aside>
 
-    {{-- ================= Main Content ================= --}}
-    <main class="flex-1 p-8">
+    {{-- Main Content--}}
+    <main class="flex-1 p-8 max-w-7xl mx-auto">
+
 
         {{-- Top Header --}}
         <div class="flex justify-between items-center mb-8">

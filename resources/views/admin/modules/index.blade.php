@@ -1,42 +1,48 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Modules
-        </h2>
-    </x-slot>
+<x-admin-layout>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded shadow">
-
-                <table class="w-full border">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border p-2">ID</th>
-                            <th class="border p-2">Name</th>
-                            <th class="border p-2">Available</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($modules as $module)
-                            <tr>
-                                <td class="border p-2">{{ $module->id }}</td>
-                                <td class="border p-2">{{ $module->name }}</td>
-                                <td class="border p-2">
-                                    {{ $module->is_available ? 'Yes' : 'No' }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center p-4 text-gray-500">
-                                    No modules found.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Modules</h2>
+        <p class="text-gray-500">Manage system modules</p>
     </div>
-</x-app-layout>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 text-gray-600">
+                <tr>
+                    <th class="px-4 py-3 text-left">Module</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                @foreach ($modules as $module)
+                    <tr>
+                        <td class="px-4 py-3 font-medium">
+                            {{ $module->name }}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs rounded
+                                {{ $module->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                {{ $module->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <form method="POST"
+                                  action="{{ route('admin.modules.toggle', $module) }}">
+                                @csrf
+                                @method('PATCH')
+
+                                <button class="text-blue-600 hover:underline text-sm">
+                                    Toggle
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+</x-admin-layout>
