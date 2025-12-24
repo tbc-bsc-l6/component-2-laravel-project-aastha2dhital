@@ -4,12 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Student\ModuleController as StudentModuleController;
 
-/*
-|--------------------------------------------------------------------------
-| Public
-|--------------------------------------------------------------------------
-*/
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -63,6 +59,16 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])
             ->name('modules.toggle');
+    });
+
+    // Student
+    Route::middleware(['auth', 'role:student'])
+    ->prefix('student')
+    ->name('student.')
+    ->group(function () {
+
+        Route::post('/modules/{module}/enroll', [StudentModuleController::class, 'enroll'])
+            ->name('modules.enroll');
     });
 
 require __DIR__.'/auth.php';
