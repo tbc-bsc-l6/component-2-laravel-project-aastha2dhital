@@ -5,92 +5,69 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 
 require __DIR__ . '/auth.php';
 
+// HOME / DASHBOARD REDIRECT
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD REDIRECT
-|--------------------------------------------------------------------------
-*/
 Route::middleware('auth')->get('/dashboard', function () {
     $user = auth()->user();
 
     return match ($user->role->role) {
-        'admin'   => redirect()->route('admin.dashboard'),
-        'teacher' => redirect()->route('teacher.dashboard'),
-        'student' => redirect()->route('student.dashboard'),
-        default   => abort(403),
+        'admin'       => redirect()->route('admin.dashboard'),
+        'teacher'     => redirect()->route('teacher.dashboard'),
+        'student'     => redirect()->route('student.dashboard'),
+        'old_student' => redirect()->route('student.dashboard'),
+        default       => abort(403),
     };
 })->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| PROFILE
-|--------------------------------------------------------------------------
-*/
+// PROFILE
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN ROUTES
-|--------------------------------------------------------------------------
-*/
+// ADMIN ROUTES
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-             ->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/modules', [AdminModuleController::class, 'index'])
-            ->name('modules.index');
+        Route::get('/modules', [AdminModuleController::class, 'index'])->name('modules.index');
+        Route::get('/modules/create', [AdminModuleController::class, 'create'])->name('modules.create');
+        Route::post('/modules', [AdminModuleController::class, 'store'])->name('modules.store');
+        Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])->name('modules.toggle');
 
-        Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])
-            ->name('modules.toggle');
-
-        Route::get('/teachers', [AdminController::class, 'teachers'])
-            ->name('teachers');
-
-        Route::get('/students', [AdminController::class, 'students'])
-            ->name('students');
+        Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers');
+        Route::get('/students', [AdminController::class, 'students'])->name('students');
+        Route::get('/old-students', [AdminController::class, 'oldStudents'])->name('old-students');
     });
 
-/*
-|--------------------------------------------------------------------------
-| TEACHER ROUTES
-|--------------------------------------------------------------------------
-*/
+// TEACHER ROUTES
 Route::middleware(['auth', 'role:teacher'])
     ->prefix('teacher')
     ->name('teacher.')
     ->group(function () {
-
-        Route::get('/dashboard', function () {
-            return view('teacher.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
     });
 
-/*
-|--------------------------------------------------------------------------
-| STUDENT ROUTES
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'role:student'])
+// STUDENT ROUTES (Current + Old)
+Route::middleware(['auth', 'role:student,old_student'])
     ->prefix('student')
     ->name('student.')
     ->group(function () {
-
-        Route::get('/dashboard', function () {
-            return view('student.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [StudentDashboardController::class, 'index'])
+            ->name('dashboard');
     });
+
+

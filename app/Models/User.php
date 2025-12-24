@@ -48,8 +48,8 @@ class User extends Authenticatable
     // A student is enrolled in many modules
     public function modules()
     {
-        return $this->belongsToMany(Module::class, 'module_user')
-                    ->withPivot('status', 'completed_at')
+        return $this->belongsToMany(Module::class)
+                    ->withPivot('enrolled_at', 'completed_at', 'pass_status')
                     ->withTimestamps();
     }
 }

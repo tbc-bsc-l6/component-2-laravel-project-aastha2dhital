@@ -1,7 +1,7 @@
-<!-- resources/views/admin/teachers.blade.php -->
+<!-- resources/views/admin/students.blade.php -->
 <x-admin-layout>
-    <x-slot name="header">Teachers</x-slot>
-    <x-slot name="subheader">Manage system teachers</x-slot>
+    <x-slot name="header">Students</x-slot>
+    <x-slot name="subheader">Manage current students</x-slot>
 
     <div class="bg-white rounded-lg shadow overflow-x-auto">
         <table class="w-full text-sm">
@@ -13,12 +13,12 @@
                 </tr>
             </thead>
             <tbody class="divide-y">
-                @foreach ($teachers as $teacher)
+                @foreach ($students as $student)
                     <tr>
-                        <td class="px-4 py-3 font-medium">{{ $teacher->name }}</td>
-                        <td class="px-4 py-3">{{ $teacher->email }}</td>
+                        <td class="px-4 py-3 font-medium">{{ $student->name }}</td>
+                        <td class="px-4 py-3">{{ $student->email }}</td>
                         <td class="px-4 py-3">
-                            <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}">
+                            <form method="POST" action="{{ route('admin.students.destroy', $student) }}">
                                 @csrf
                                 @method('DELETE')
                                 <button class="text-red-600 hover:underline text-sm">Remove</button>

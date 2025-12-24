@@ -17,23 +17,27 @@
 
         <nav class="mt-6 space-y-1">
             <a href="{{ route('admin.dashboard') }}"
-               class="block px-6 py-3 hover:bg-indigo-50">
-                Dashboard
+            class="block px-6 py-3
+            {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
+            Dashboard
             </a>
 
             <a href="{{ route('admin.modules.index') }}"
-               class="block px-6 py-3 hover:bg-indigo-50">
-                Modules
+            class="block px-6 py-3
+            {{ request()->routeIs('admin.modules.*') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
+             Modules
             </a>
 
             <a href="{{ route('admin.teachers') }}"
-               class="block px-6 py-3 hover:bg-indigo-50">
-                Teachers
+            class="block px-6 py-3
+            {{ request()->routeIs('admin.teachers') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
+             Teachers
             </a>
 
             <a href="{{ route('admin.students') }}"
-               class="block px-6 py-3 hover:bg-indigo-50">
-                Students
+            class="block px-6 py-3
+            {{ request()->routeIs('admin.students') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
+            Students
             </a>
         </nav>
     </aside>
