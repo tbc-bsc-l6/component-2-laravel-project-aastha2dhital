@@ -2,52 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>@yield('title', 'Admin Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<body class="bg-gray-100">
 
-<body class="bg-gray-100 font-sans antialiased">
 <div class="flex min-h-screen">
 
-    {{-- Sidebar --}}
-    <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
-        <div class="px-6 py-4 text-xl font-semibold border-b border-gray-700">
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white shadow-lg">
+        <div class="p-6 text-xl font-bold text-indigo-600">
             Admin Panel
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-2">
+        <nav class="mt-6 space-y-1">
             <a href="{{ route('admin.dashboard') }}"
-               class="block px-4 py-2 rounded hover:bg-gray-800">
+               class="block px-6 py-3 hover:bg-indigo-50">
                 Dashboard
             </a>
 
-            <a href="#"
-               class="block px-4 py-2 rounded hover:bg-gray-800">
+            <a href="{{ route('admin.modules.index') }}"
+               class="block px-6 py-3 hover:bg-indigo-50">
                 Modules
             </a>
 
-            <a href="#"
-               class="block px-4 py-2 rounded hover:bg-gray-800">
+            <a href="{{ route('admin.teachers') }}"
+               class="block px-6 py-3 hover:bg-indigo-50">
                 Teachers
             </a>
 
-            <a href="#"
-               class="block px-4 py-2 rounded hover:bg-gray-800">
+            <a href="{{ route('admin.students') }}"
+               class="block px-6 py-3 hover:bg-indigo-50">
                 Students
             </a>
         </nav>
-
-        <div class="px-6 py-4 border-t border-gray-700 text-sm">
-            Logged in as <br>
-            <span class="font-medium">{{ auth()->user()->name }}</span>
-        </div>
     </aside>
 
-    {{-- Main Content --}}
-    <main class="flex-1 p-8">
-        {{ $slot }}
+    <!-- MAIN CONTENT -->
+    <main class="flex-1">
+
+        <!-- TOPBAR -->
+        <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
+            <h1 class="text-lg font-semibold">
+                @yield('header', 'Dashboard')
+            </h1>
+
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-600">
+                    {{ auth()->user()->name }}
+                </span>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="text-red-500 hover:underline">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <section class="p-6">
+            @yield('content')
+        </section>
+
     </main>
 
 </div>
+
 </body>
 </html>
