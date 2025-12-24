@@ -42,7 +42,7 @@ class User extends Authenticatable
     // A teacher teaches many modules
     public function teachingModules()
     {
-        return $this->hasMany(Module::class, 'teacher_id');
+        return $this->belongsToMany(Module::class, 'module_teacher');
     }
 
     // A student is enrolled in many modules

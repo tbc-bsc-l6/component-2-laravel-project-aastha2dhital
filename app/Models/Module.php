@@ -10,11 +10,15 @@ class Module extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['module'];
+    protected $fillable = [
+    'name',
+    'description',
+    'is_active',
+];
 
-    public function teacher()
+    public function teachers()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
+        return $this->belongsToMany(User::class, 'module_teacher');
     }
 
     public function students()

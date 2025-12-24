@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
+use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -16,10 +17,13 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
-    $user = auth()->user();
+    $role = auth()->user()->role->role;
 
-    return match ($user->role->role) {
+    return match ($role) {
         'admin' => redirect()->route('admin.dashboard'),
+        'student' => redirect()->route('student.modules.index'),
+        'teacher' => redirect()->route('teacher.dashboard'),
+        'old_student' => redirect()->route('old-student.dashboard'),
         default => abort(403),
     };
 })->name('dashboard');
@@ -67,8 +71,24 @@ Route::middleware(['auth', 'role:admin'])
     ->name('student.')
     ->group(function () {
 
+        Route::get('/modules', [StudentModuleController::class, 'index'])
+            ->name('modules.index');
+
         Route::post('/modules/{module}/enroll', [StudentModuleController::class, 'enroll'])
             ->name('modules.enroll');
     });
+
+    //Teacher
+    Route::middleware(['auth', 'role:teacher'])
+    ->prefix('teacher')
+    ->name('teacher.')
+    ->group(function () {
+
+        Route::get('/modules', [TeacherModuleController::class, 'index'])
+            ->name('modules.index');
+
+        Route::get('/modules/{module}', [TeacherModuleController::class, 'show'])
+            ->name('modules.show');
+});
 
 require __DIR__.'/auth.php';
