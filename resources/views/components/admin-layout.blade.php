@@ -31,18 +31,18 @@
                 Modules
             </a>
 
-            <a href="{{ route('admin.teachers') }}"
-               class="block px-4 py-2 rounded {{ request()->routeIs('admin.teachers') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
-                Teachers
+            <a href="#"
+              class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
+              Teachers 
             </a>
 
-            <a href="{{ route('admin.students') }}"
-               class="block px-4 py-2 rounded {{ request()->routeIs('admin.students') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+            <a href="#"
+               class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
                 Students
             </a>
 
-            <a href="{{ route('admin.old-students') }}"
-               class="block px-4 py-2 rounded {{ request()->routeIs('admin.old-students') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+            <a href="#"
+               class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
                 Old Students
             </a>
         </nav>
