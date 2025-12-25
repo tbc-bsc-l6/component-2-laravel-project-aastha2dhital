@@ -31,7 +31,7 @@ class AdminController extends Controller
 
     public function createTeacher()
     {
-    return view('admin.create-teacher');
+        return view('admin.create-teacher');
     }
 
     public function storeTeacher(Request $request)
@@ -56,6 +56,20 @@ class AdminController extends Controller
     return redirect()
         ->route('admin.teachers.index')
         ->with('success', 'Teacher created successfully.');
+    }
+
+    public function destroyTeacher(User $user)
+    {
+    // Ensure user is a teacher
+    abort_unless($user->role->role === 'teacher', 403);
+
+    // Detach from modules
+    $user->teachingModules()->detach();
+
+    // Delete teacher account
+    $user->delete();
+
+    return back()->with('success', 'Teacher removed successfully.');
     }
 
     public function students()

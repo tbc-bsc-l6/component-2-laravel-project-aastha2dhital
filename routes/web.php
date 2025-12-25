@@ -54,6 +54,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/modules/{module}', [AdminModuleController::class, 'update'])->name('modules.update');
         Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])->name('modules.toggle');
         Route::delete('/modules/{module}/students/{user}',[AdminModuleController::class, 'removeStudent'])->name('modules.students.remove');
+        Route::delete('/teachers/{user}',[AdminController::class, 'destroyTeacher'])->name('teachers.destroy');
 
         // Teachers
         Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers.index');
