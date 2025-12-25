@@ -11,13 +11,13 @@
                     Module Name
                 </label>
                 <input
-                    type="text"
-                    name="module"
-                    class="w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                    required
+                type="text"
+                name="module"
+                value="{{ old('module') }}"
+                class="w-full border rounded p-2"
+                required
                 >
             </div>
-
             <div class="flex justify-end gap-2">
                 <a href="{{ route('admin.modules.index') }}"
                    class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">

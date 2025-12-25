@@ -37,14 +37,15 @@ class AdminModuleController extends Controller
 
     public function toggle(Module $module)
     {
-        $module->is_active = !$module->is_active;
-        $module->save();
+        $module->update([
+            'is_active' => ! $module->is_active,
+        ]);
 
-        return redirect()->back()->with('success', 'Module status updated!');
+        return back()->with('success', 'Module status updated!');
     }
 
     /**
-     * Show assign teacher page
+     * Assign teachers to a module
      */
     public function edit(Module $module)
     {
@@ -55,9 +56,6 @@ class AdminModuleController extends Controller
         return view('admin.modules.edit', compact('module', 'teachers'));
     }
 
-    /**
-     * Save assigned teachers
-     */
     public function update(Request $request, Module $module)
     {
         $request->validate([
@@ -69,5 +67,37 @@ class AdminModuleController extends Controller
         return redirect()
             ->route('admin.modules.index')
             ->with('success', 'Teachers assigned successfully.');
+    }
+
+    /**
+     * View students enrolled in a module
+     */
+    public function students(Module $module)
+    {
+        $students = $module->users()->get();
+
+        return view('admin.modules.students', compact('module', 'students'));
+    }
+
+    /**
+     * Remove a student from a module
+     */
+    public function removeStudent(Module $module, User $user)
+    {
+        // Ensure user is enrolled
+        abort_unless(
+            $module->users()->where('users.id', $user->id)->exists(),
+            404
+        );
+
+        // Optional: ensure user is a student / old student
+        abort_unless(
+            in_array($user->role->role, ['student', 'old_student']),
+            403
+        );
+
+        $module->users()->detach($user->id);
+
+        return back()->with('success', 'Student removed from module successfully.');
     }
 }

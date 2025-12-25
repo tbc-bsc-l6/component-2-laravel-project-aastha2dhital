@@ -42,10 +42,13 @@
                     @foreach ($modules as $module)
                         <tr class="hover:bg-gray-50 transition">
                             {{-- Module Name --}}
-                            <td class="px-6 py-4 font-medium text-gray-800">
+                            <td class="p-3">
+                                <a href="{{ route('admin.modules.students', $module) }}"
+                                class="text-indigo-600 hover:underline font-medium">
                                 {{ $module->module }}
-                            </td>
-
+                            </a>
+                        </td>
+                        
                             {{-- Status --}}
                             <td class="px-6 py-4">
                                 <span
