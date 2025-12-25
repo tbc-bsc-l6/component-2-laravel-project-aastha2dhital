@@ -33,7 +33,7 @@ class AdminSeeder extends Seeder
             User::create([
                 'name' => 'Admin',
                 'email' => $adminEmail,
-                'password' => Hash::make('password'), // Change to a secure password in production
+                'password' => Hash::make('password'), 
                 'user_role_id' => $adminRoleId,
             ]);
         }

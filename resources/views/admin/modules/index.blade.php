@@ -37,6 +37,7 @@
                         <th class="px-6 py-4 text-right">Action</th>
                     </tr>
                 </thead>
+
                 <tbody class="divide-y">
                     @foreach ($modules as $module)
                         <tr class="hover:bg-gray-50 transition">
@@ -54,9 +55,11 @@
                                 </span>
                             </td>
 
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-right space-x-3">
+                                {{-- Toggle --}}
                                 <form method="POST"
-                                      action="{{ route('admin.modules.toggle', $module) }}">
+                                      action="{{ route('admin.modules.toggle', $module) }}"
+                                      class="inline">
                                     @csrf
                                     @method('PATCH')
 
@@ -67,6 +70,12 @@
                                         Toggle
                                     </button>
                                 </form>
+
+                                {{-- Assign Teacher --}}
+                                <a href="{{ route('admin.modules.edit', $module) }}"
+                                   class="text-sm text-indigo-600 underline hover:text-indigo-800">
+                                    Assign Teacher
+                                </a>
                             </td>
                         </tr>
                     @endforeach

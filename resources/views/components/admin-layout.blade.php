@@ -1,4 +1,3 @@
-<!-- resources/views/components/admin-layout.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,37 +13,42 @@
     {{-- Sidebar --}}
     <aside class="w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col">
 
-        {{-- Logo / Title --}}
+        {{-- Logo --}}
         <div class="px-6 py-4 text-xl font-bold border-b border-gray-800 tracking-wide">
             Admin Panel
         </div>
 
         {{-- Navigation --}}
         <nav class="flex-1 px-4 py-6 space-y-1">
+
             <a href="{{ route('admin.dashboard') }}"
-               class="block px-4 py-2 rounded {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+               class="block px-4 py-2 rounded
+               {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
                 Dashboard
             </a>
 
             <a href="{{ route('admin.modules.index') }}"
-               class="block px-4 py-2 rounded {{ request()->routeIs('admin.modules.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+               class="block px-4 py-2 rounded
+               {{ request()->routeIs('admin.modules.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
                 Modules
             </a>
 
-            <a href="#"
-              class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
-              Teachers 
+            {{-- ✅ ENABLED --}}
+            <a href="{{ route('admin.teachers.index') }}"
+               class="block px-4 py-2 rounded
+               {{ request()->routeIs('admin.teachers.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+                Teachers
             </a>
 
-            <a href="#"
-               class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
+            {{-- 🚧 Disabled until routes exist --}}
+            <span class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
                 Students
-            </a>
+            </span>
 
-            <a href="#"
-               class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
+            <span class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
                 Old Students
-            </a>
+            </span>
+
         </nav>
 
         {{-- User Info --}}
@@ -83,5 +87,6 @@
 
     </main>
 </div>
+
 </body>
 </html>

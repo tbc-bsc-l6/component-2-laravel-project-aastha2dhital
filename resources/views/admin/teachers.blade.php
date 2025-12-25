@@ -1,31 +1,35 @@
-<!-- resources/views/admin/teachers.blade.php -->
 <x-admin-layout>
     <x-slot name="header">Teachers</x-slot>
     <x-slot name="subheader">Manage system teachers</x-slot>
 
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
+    <div class="mb-6 flex justify-end">
+        <a href="{{ route('admin.teachers.create') }}"
+           class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            + Add Teacher
+        </a>
+    </div>
+
+    <div class="bg-white shadow rounded">
         <table class="w-full text-sm">
-            <thead class="bg-gray-100 text-gray-600">
+            <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-4 py-3 text-left">Name</th>
-                    <th class="px-4 py-3 text-left">Email</th>
-                    <th class="px-4 py-3 text-left">Action</th>
+                    <th class="px-6 py-3 text-left">Name</th>
+                    <th class="px-6 py-3 text-left">Email</th>
                 </tr>
             </thead>
-            <tbody class="divide-y">
-                @foreach ($teachers as $teacher)
+            <tbody>
+                @forelse($teachers as $teacher)
+                    <tr class="border-t">
+                        <td class="px-6 py-3">{{ $teacher->name }}</td>
+                        <td class="px-6 py-3">{{ $teacher->email }}</td>
+                    </tr>
+                @empty
                     <tr>
-                        <td class="px-4 py-3 font-medium">{{ $teacher->name }}</td>
-                        <td class="px-4 py-3">{{ $teacher->email }}</td>
-                        <td class="px-4 py-3">
-                            <form method="POST" action="{{ route('admin.teachers.destroy', $teacher) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class="text-red-600 hover:underline text-sm">Remove</button>
-                            </form>
+                        <td colspan="2" class="px-6 py-6 text-center text-gray-500">
+                            No teachers created yet.
                         </td>
                     </tr>
-                @endforeach
+                @endforelse
             </tbody>
         </table>
     </div>

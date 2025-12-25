@@ -1,28 +1,28 @@
-<h1>Create Teacher</h1>
+<x-admin-layout>
+    <x-slot name="header">Create Teacher</x-slot>
 
-<form method="POST" action="/admin/teachers">
-    @csrf
+    <div class="max-w-md bg-white p-6 rounded shadow">
+        <form method="POST" action="{{ route('admin.teachers.store') }}">
+            @csrf
 
-    <div>
-        <label>Name</label><br>
-        <input type="text" name="name">
+            <div class="mb-4">
+                <label class="block text-sm font-medium">Name</label>
+                <input type="text" name="name" class="w-full border rounded px-3 py-2" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium">Email</label>
+                <input type="email" name="email" class="w-full border rounded px-3 py-2" required>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium">Password</label>
+                <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
+            </div>
+
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                Create Teacher
+            </button>
+        </form>
     </div>
-
-    <br>
-
-    <div>
-        <label>Email</label><br>
-        <input type="email" name="email">
-    </div>
-
-    <br>
-
-    <div>
-        <label>Password</label><br>
-        <input type="password" name="password">
-    </div>
-
-    <br>
-
-    <button type="submit">Create Teacher</button>
-</form>
+</x-admin-layout>

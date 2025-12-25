@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminModuleController extends Controller
@@ -40,5 +41,33 @@ class AdminModuleController extends Controller
         $module->save();
 
         return redirect()->back()->with('success', 'Module status updated!');
+    }
+
+    /**
+     * Show assign teacher page
+     */
+    public function edit(Module $module)
+    {
+        $teachers = User::whereHas('role', function ($query) {
+            $query->where('role', 'teacher');
+        })->get();
+
+        return view('admin.modules.edit', compact('module', 'teachers'));
+    }
+
+    /**
+     * Save assigned teachers
+     */
+    public function update(Request $request, Module $module)
+    {
+        $request->validate([
+            'teachers' => 'nullable|array',
+        ]);
+
+        $module->teachers()->sync($request->teachers ?? []);
+
+        return redirect()
+            ->route('admin.modules.index')
+            ->with('success', 'Teachers assigned successfully.');
     }
 }

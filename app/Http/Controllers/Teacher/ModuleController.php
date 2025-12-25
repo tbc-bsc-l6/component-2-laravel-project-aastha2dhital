@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
@@ -24,17 +26,47 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        // Security: ensure teacher is assigned to this module
+        // Ensure teacher is assigned to this module
         abort_unless(
             $module->teachers()->where('users.id', auth()->id())->exists(),
             403
         );
 
         $students = $module->users()
-            ->whereIn('user_role_id', [3, 4]) // student + old_student
+            ->wherePivotNull('completed_at') // active students only
             ->withPivot(['enrolled_at', 'pass_status', 'completed_at'])
             ->get();
 
         return view('teacher.modules.show', compact('module', 'students'));
+    }
+
+    /**
+     * Grade student PASS / FAIL
+     */
+    public function grade(Request $request, Module $module, User $user)
+    {
+        // Ensure teacher owns module
+        abort_unless(
+            $module->teachers()->where('users.id', auth()->id())->exists(),
+            403
+        );
+
+        // Ensure student is enrolled
+        abort_unless(
+            $module->users()->where('users.id', $user->id)->exists(),
+            404
+        );
+
+        $request->validate([
+            'pass_status' => 'required|in:PASS,FAIL',
+        ]);
+
+        // Update pivot table
+        $module->users()->updateExistingPivot($user->id, [
+            'pass_status'  => $request->pass_status,
+            'completed_at' => now(),
+        ]);
+
+        return back()->with('success', 'Student graded successfully.');
     }
 }
