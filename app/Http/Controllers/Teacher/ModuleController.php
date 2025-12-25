@@ -24,20 +24,26 @@ class ModuleController extends Controller
     /**
      * Show students enrolled in a module
      */
-    public function show(Module $module)
+    public function show(Request $request, Module $module)
     {
-        // Ensure teacher is assigned to this module
-        abort_unless(
-            $module->teachers()->where('users.id', auth()->id())->exists(),
-            403
-        );
+    // Ensure teacher is assigned to this module
+    abort_unless(
+        $module->teachers()->where('users.id', auth()->id())->exists(),
+        403
+    );
 
-        $students = $module->users()
-            ->wherePivotNull('completed_at') // active students only
-            ->withPivot(['enrolled_at', 'pass_status', 'completed_at'])
-            ->get();
+    $search = $request->query('search');
 
-        return view('teacher.modules.show', compact('module', 'students'));
+    $students = $module->users()
+        ->wherePivotNull('completed_at') // active students only
+        ->when($search, function ($query) use ($search) {
+            $query->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%");
+        })
+        ->withPivot(['enrolled_at', 'pass_status', 'completed_at'])
+        ->get();
+
+    return view('teacher.modules.show', compact('module', 'students', 'search'));
     }
 
     /**
@@ -69,4 +75,23 @@ class ModuleController extends Controller
 
         return back()->with('success', 'Student graded successfully.');
     }
+
+    /**
+     * Reset student grade (PASS / FAIL → NULL)
+     */
+    public function resetGrade(Module $module, User $user)
+{
+    // Ensure teacher owns module
+    abort_unless(
+        $module->teachers()->where('users.id', auth()->id())->exists(),
+        403
+    );
+
+    $module->users()->updateExistingPivot($user->id, [
+        'pass_status'  => null,
+        'completed_at' => null,
+    ]);
+
+    return back()->with('success', 'Student result reset successfully.');
+}
 }

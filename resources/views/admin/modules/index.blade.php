@@ -26,7 +26,7 @@
         </a>
     </div>
 
-    {{-- Content --}}
+    {{-- Modules Table --}}
     @if ($modules->count())
         <div class="overflow-hidden rounded-xl bg-white shadow">
             <table class="w-full text-sm">
@@ -34,17 +34,19 @@
                     <tr>
                         <th class="px-6 py-4 text-left">Module Name</th>
                         <th class="px-6 py-4 text-left">Status</th>
-                        <th class="px-6 py-4 text-right">Action</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y">
                     @foreach ($modules as $module)
                         <tr class="hover:bg-gray-50 transition">
+                            {{-- Module Name --}}
                             <td class="px-6 py-4 font-medium text-gray-800">
                                 {{ $module->module }}
                             </td>
 
+                            {{-- Status --}}
                             <td class="px-6 py-4">
                                 <span
                                     class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
@@ -55,6 +57,7 @@
                                 </span>
                             </td>
 
+                            {{-- Actions --}}
                             <td class="px-6 py-4 text-right space-x-3">
                                 {{-- Toggle --}}
                                 <form method="POST"
@@ -71,10 +74,10 @@
                                     </button>
                                 </form>
 
-                                {{-- Assign Teacher --}}
+                                {{-- Edit / Assign Teacher --}}
                                 <a href="{{ route('admin.modules.edit', $module) }}"
-                                   class="text-sm text-indigo-600 underline hover:text-indigo-800">
-                                    Assign Teacher
+                                   class="text-sm font-medium text-indigo-600 hover:text-indigo-800 underline">
+                                    Edit / Assign Teacher
                                 </a>
                             </td>
                         </tr>

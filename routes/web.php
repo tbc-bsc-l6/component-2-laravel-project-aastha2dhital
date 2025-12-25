@@ -103,10 +103,6 @@ Route::middleware(['auth', 'role:teacher'])
     ->name('teacher.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('teacher.dashboard');
-        })->name('dashboard');
-
         Route::get('/modules', [TeacherModuleController::class, 'index'])
             ->name('modules.index');
 
@@ -116,6 +112,11 @@ Route::middleware(['auth', 'role:teacher'])
         Route::post('/modules/{module}/students/{user}/grade',
             [TeacherModuleController::class, 'grade'])
             ->name('modules.grade');
+
+        Route::post('/modules/{module}/students/{user}/reset',
+        [TeacherModuleController::class, 'resetGrade'])
+        ->name('modules.reset');
+
     });
 
 require __DIR__.'/auth.php';

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -43,5 +44,11 @@ class Module extends Model
     public function canAcceptEnrollment(): bool
     {
         return $this->is_active && $this->hasAvailableSeat();
+    }
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['enrolled_at', 'pass_status', 'completed_at'])
+            ->withTimestamps();
     }
 }
