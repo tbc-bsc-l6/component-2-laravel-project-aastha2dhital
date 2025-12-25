@@ -73,6 +73,19 @@ class ModuleController extends Controller
             'completed_at' => now(),
         ]);
 
+        /**
+         * 🔁 AUTO-PROMOTE STUDENT → OLD STUDENT
+         * When no active modules remain
+         */
+        $activeModulesRemaining = $user->modules()
+            ->wherePivotNull('completed_at')
+            ->count();
+
+        if ($activeModulesRemaining === 0) {
+            $oldStudentRoleId = UserRole::where('role', 'old_student')->value('id');
+            $user->update(['user_role_id' => $oldStudentRoleId]);
+        }
+
         return back()->with('success', 'Student graded successfully.');
     }
 
@@ -85,6 +98,12 @@ class ModuleController extends Controller
     abort_unless(
         $module->teachers()->where('users.id', auth()->id())->exists(),
         403
+    );
+
+    // Ensure student is enrolled
+    abort_unless(
+        $module->users()->where('users.id', $user->id)->exists(),
+        404
     );
 
     $module->users()->updateExistingPivot($user->id, [

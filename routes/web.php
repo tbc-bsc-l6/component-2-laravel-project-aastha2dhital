@@ -8,48 +8,34 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
 use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 
-/*
-|--------------------------------------------------------------------------
-| Root
-|--------------------------------------------------------------------------
-*/
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Dashboard Redirect (Role-based)
-|--------------------------------------------------------------------------
-*/
+//Dashboard Redirect 
+
 Route::middleware('auth')->get('/dashboard', function () {
     $role = auth()->user()->role->role;
 
     return match ($role) {
         'admin'       => redirect()->route('admin.dashboard'),
-        'student'     => redirect()->route('student.modules.index'),
         'teacher'     => redirect()->route('teacher.modules.index'),
-        'old_student' => redirect()->route('old-student.dashboard'),
+        'student'     => redirect()->route('student.modules.index'),
+        'old_student' => redirect()->route('student.history'),
         default       => abort(403),
     };
 })->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| Profile
-|--------------------------------------------------------------------------
-*/
+//Profile
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Admin Routes
-|--------------------------------------------------------------------------
-*/
+// Admin Routes
+
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -76,11 +62,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/old-students', [AdminController::class, 'oldStudents'])->name('old-students.index');
     });
 
-/*
-|--------------------------------------------------------------------------
-| Student Routes
-|--------------------------------------------------------------------------
-*/
+// Student Routes (ACTIVE students only)
+
 Route::middleware(['auth', 'role:student'])
     ->prefix('student')
     ->name('student.')
@@ -93,11 +76,20 @@ Route::middleware(['auth', 'role:student'])
             ->name('modules.enroll');
     });
 
-/*
-|--------------------------------------------------------------------------
-| Teacher Routes
-|--------------------------------------------------------------------------
-*/
+// Old Student Routes (HISTORY ONLY)
+
+Route::middleware(['auth', 'role:old_student'])
+    ->prefix('student')
+    ->name('student.')
+    ->group(function () {
+
+        Route::get('/history', [StudentModuleController::class, 'history'])
+            ->name('history');
+    });
+
+
+// Teacher Routes
+
 Route::middleware(['auth', 'role:teacher'])
     ->prefix('teacher')
     ->name('teacher.')
@@ -114,9 +106,8 @@ Route::middleware(['auth', 'role:teacher'])
             ->name('modules.grade');
 
         Route::post('/modules/{module}/students/{user}/reset',
-        [TeacherModuleController::class, 'resetGrade'])
-        ->name('modules.reset');
-
+            [TeacherModuleController::class, 'resetGrade'])
+            ->name('modules.reset');
     });
 
 require __DIR__.'/auth.php';
