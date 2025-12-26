@@ -16,30 +16,41 @@
         </div>
 
         <nav class="mt-6 space-y-1">
-            <a href="{{ route('admin.dashboard') }}"
-            class="block px-6 py-3
-            {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
-            Dashboard
-            </a>
 
-            <a href="{{ route('admin.modules.index') }}"
-            class="block px-6 py-3
-            {{ request()->routeIs('admin.modules.*') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
-             Modules
-            </a>
+    <a href="{{ route('admin.dashboard') }}"
+       class="block px-6 py-3
+       {{ request()->routeIs('admin.dashboard') 
+            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
+            : 'hover:bg-indigo-50 text-gray-700' }}">
+        Dashboard
+    </a>
 
-            <a href="{{ route('admin.teachers') }}"
-            class="block px-6 py-3
-            {{ request()->routeIs('admin.teachers') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
-             Teachers
-            </a>
+    <a href="{{ route('admin.modules.index') }}"
+       class="block px-6 py-3
+       {{ request()->routeIs('admin.modules.*') 
+            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
+            : 'hover:bg-indigo-50 text-gray-700' }}">
+        Modules
+    </a>
 
-            <a href="{{ route('admin.students') }}"
-            class="block px-6 py-3
-            {{ request()->routeIs('admin.students') ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-indigo-50' }}">
-            Students
-            </a>
-        </nav>
+    <a href="{{ route('admin.teachers.index') }}"
+       class="block px-6 py-3
+       {{ request()->routeIs('admin.teachers.*') 
+            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
+            : 'hover:bg-indigo-50 text-gray-700' }}">
+        Teachers
+    </a>
+    <a href="{{ route('admin.students.index') }}"
+    class="block px-6 py-3{{ request()->routeIs('admin.students.*')? 'bg-indigo-100 text-indigo-700 font-semibold': 'hover:bg-indigo-50 text-gray-700' }}">
+    Students
+    </a>
+
+    <a href="{{ route('admin.old-students.index') }}"
+    class="block px-6 py-3{{ request()->routeIs('admin.old-students.*')? 'bg-indigo-100 text-indigo-700 font-semibold': 'hover:bg-indigo-50 text-gray-700' }}">
+    Old Students
+    </a>
+
+</nav>
     </aside>
 
     <!-- MAIN CONTENT -->

@@ -78,7 +78,7 @@ class AdminController extends Controller
             $q->where('role', 'student');
         })->get();
 
-        return view('admin.students', compact('students'));
+        return view('admin.modules.students', compact('students'));
     }
 
     public function oldStudents()

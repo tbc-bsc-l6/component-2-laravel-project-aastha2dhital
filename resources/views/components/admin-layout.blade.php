@@ -6,63 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-100 font-sans antialiased">
 
 <div class="flex min-h-screen">
 
-    {{-- Sidebar --}}
+    {{-- SIDEBAR --}}
     <aside class="w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col">
 
-        {{-- Logo --}}
+        {{-- LOGO --}}
         <div class="px-6 py-4 text-xl font-bold border-b border-gray-800 tracking-wide">
             Admin Panel
         </div>
 
-        {{-- Navigation --}}
-        <nav class="flex-1 px-4 py-6 space-y-1">
+        {{-- NAVIGATION --}}
+        <nav class="flex-1 px-2 py-6 space-y-1 text-sm">
 
+            {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
-               class="block px-4 py-2 rounded
-               {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+               class="flex items-center px-6 py-3 font-medium
+               {{ request()->routeIs('admin.dashboard')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                 Dashboard
             </a>
 
+            {{-- Modules --}}
             <a href="{{ route('admin.modules.index') }}"
-               class="block px-4 py-2 rounded
-               {{ request()->routeIs('admin.modules.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+               class="flex items-center px-6 py-3 font-medium
+               {{ request()->routeIs('admin.modules.*')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                 Modules
             </a>
 
-            {{-- ✅ ENABLED --}}
+            {{-- Teachers --}}
             <a href="{{ route('admin.teachers.index') }}"
-               class="block px-4 py-2 rounded
-               {{ request()->routeIs('admin.teachers.*') ? 'bg-gray-800 font-medium' : 'hover:bg-gray-800' }}">
+               class="flex items-center px-6 py-3 font-medium
+               {{ request()->routeIs('admin.teachers.*')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                 Teachers
             </a>
 
-            {{-- 🚧 Disabled until routes exist --}}
-            <span class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
+            {{-- Students --}}
+            <a href="{{ route('admin.students.index') }}"
+               class="flex items-center px-6 py-3 font-medium
+               {{ request()->routeIs('admin.students.*')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                 Students
-            </span>
+            </a>
 
-            <span class="block px-4 py-2 rounded text-gray-400 cursor-not-allowed">
+            {{-- Old Students --}}
+            <a href="{{ route('admin.old-students.index') }}"
+               class="flex items-center px-6 py-3 font-medium
+               {{ request()->routeIs('admin.old-students.*')
+                    ? 'bg-white/10 text-white'
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                 Old Students
-            </span>
+            </a>
 
         </nav>
 
-        {{-- User Info --}}
+        {{-- USER INFO --}}
         <div class="px-6 py-4 border-t border-gray-800 text-sm">
             <p class="text-gray-400">Logged in as</p>
-            <p class="font-medium">{{ auth()->user()->name }}</p>
+            <p class="font-medium text-white">
+                {{ auth()->user()->name }}
+            </p>
         </div>
 
     </aside>
 
-    {{-- Main Content --}}
+    {{-- MAIN CONTENT --}}
     <main class="flex-1 p-8">
 
-        {{-- Top Header --}}
+        {{-- TOP HEADER --}}
         <div class="flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">
@@ -73,7 +93,7 @@
                 </p>
             </div>
 
-            {{-- Logout --}}
+            {{-- LOGOUT --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button class="text-sm text-red-600 hover:underline">
@@ -82,10 +102,11 @@
             </form>
         </div>
 
-        {{-- Page Content --}}
+        {{-- PAGE CONTENT --}}
         {{ $slot }}
 
     </main>
+
 </div>
 
 </body>

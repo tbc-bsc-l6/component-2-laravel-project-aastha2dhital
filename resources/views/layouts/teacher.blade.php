@@ -5,7 +5,7 @@
     <title>Teacher Panel</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100">
+<body class="font-[Inter] bg-slate-100 text-slate-800">
 
     {{-- Top Bar --}}
     <div class="bg-white shadow p-4 flex justify-between">

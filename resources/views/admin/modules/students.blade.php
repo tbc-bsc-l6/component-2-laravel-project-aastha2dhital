@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        Students — {{ $module->module }}
+        Students
     </x-slot>
 
     @if(session('success'))
@@ -15,7 +15,6 @@
                 <tr>
                     <th class="p-3 text-left">Name</th>
                     <th class="p-3 text-left">Email</th>
-                    <th class="p-3 text-left">Action</th>
                 </tr>
             </thead>
 
@@ -24,25 +23,11 @@
                     <tr class="border-t">
                         <td class="p-3">{{ $student->name }}</td>
                         <td class="p-3">{{ $student->email }}</td>
-                        <td class="p-3">
-                            {{-- ✅ REMOVE STUDENT --}}
-                            <form method="POST"
-                                  action="{{ route('admin.modules.students.remove', [$module, $student]) }}"
-                                  onsubmit="return confirm('Remove this student from the module?')"
-                                  class="inline">
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="text-red-600 hover:underline">
-                                    Remove
-                                </button>
-                            </form>
-                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="p-4 text-center text-gray-500">
-                            No students enrolled in this module.
+                        <td colspan="2" class="p-4 text-center text-gray-500">
+                            No students found.
                         </td>
                     </tr>
                 @endforelse
