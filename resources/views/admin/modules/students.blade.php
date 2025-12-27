@@ -20,9 +20,19 @@
 
             <tbody>
                 @forelse($students as $student)
-                    <tr class="border-t">
-                        <td class="p-3">{{ $student->name }}</td>
-                        <td class="p-3">{{ $student->email }}</td>
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="p-3 font-medium">
+                            {{ $student->name }}
+                            <span 
+                            class="ml-2 px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded cursor-default" 
+                            title="Active student">
+                            Active
+                        </span>
+
+                        </td>
+                        <td class="p-3 text-gray-600">
+                            {{ $student->email }}
+                        </td>
                     </tr>
                 @empty
                     <tr>

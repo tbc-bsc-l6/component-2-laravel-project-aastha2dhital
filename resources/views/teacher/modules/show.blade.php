@@ -15,7 +15,8 @@
                     {{ $module->module }}
                 </h1>
                 <p class="mt-1 text-sm text-gray-500">
-                    Manage student results for this module
+                    Assign PASS or FAIL to students. Graded students will appear
+                    in their completed module history.
                 </p>
             </div>
 
@@ -61,6 +62,10 @@
 
                 <tbody class="divide-y">
                     @foreach ($students as $student)
+                        @php
+                            $status = strtolower($student->pivot->pass_status ?? '');
+                        @endphp
+
                         <tr class="hover:bg-gray-50 transition">
                             {{-- Student --}}
                             <td class="px-6 py-4 font-medium text-gray-800">
@@ -69,12 +74,15 @@
 
                             {{-- Result --}}
                             <td class="px-6 py-4 text-center">
-                                @if ($student->pivot->pass_status)
+                                @if ($status === 'pass')
                                     <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
-                                        {{ $student->pivot->pass_status === 'PASS'
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-red-100 text-red-700' }}">
-                                        {{ $student->pivot->pass_status }}
+                                                 bg-green-100 text-green-700">
+                                        PASS
+                                    </span>
+                                @elseif ($status === 'fail')
+                                    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
+                                                 bg-red-100 text-red-700">
+                                        FAIL
                                     </span>
                                 @else
                                     <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-500">
@@ -85,7 +93,7 @@
 
                             {{-- Actions --}}
                             <td class="px-6 py-4 text-right">
-                                @if ($student->pivot->pass_status)
+                                @if ($status)
                                     {{-- Reset --}}
                                     <form method="POST"
                                           action="{{ route('teacher.modules.reset', [$module, $student]) }}"
@@ -103,13 +111,13 @@
                                           action="{{ route('teacher.modules.grade', [$module, $student]) }}"
                                           class="inline-flex gap-2">
                                         @csrf
-                                        <button name="pass_status" value="PASS"
+                                        <button name="pass_status" value="pass"
                                             class="rounded-lg bg-green-600 px-4 py-1.5 text-xs
                                                    font-semibold text-white shadow hover:bg-green-700">
                                             PASS
                                         </button>
 
-                                        <button name="pass_status" value="FAIL"
+                                        <button name="pass_status" value="fail"
                                             class="rounded-lg bg-red-600 px-4 py-1.5 text-xs
                                                    font-semibold text-white shadow hover:bg-red-700">
                                             FAIL

@@ -49,45 +49,36 @@ class ModuleController extends Controller
     /**
      * Grade student PASS / FAIL
      */
-    public function grade(Request $request, Module $module, User $user)
-    {
-        // Ensure teacher owns module
-        abort_unless(
-            $module->teachers()->where('users.id', auth()->id())->exists(),
-            403
-        );
+    public function grade(Module $module, User $user, Request $request)
+{
+    $request->validate([
+        'pass_status' => 'required|in:pass,fail',
+    ]);
 
-        // Ensure student is enrolled
-        abort_unless(
-            $module->users()->where('users.id', $user->id)->exists(),
-            404
-        );
+    // Mark module as completed
+    $module->users()->updateExistingPivot($user->id, [
+        'pass_status' => $request->pass_status,
+        'completed_at' => now(),
+    ]);
 
-        $request->validate([
-            'pass_status' => 'required|in:PASS,FAIL',
+    // CHECK IF STUDENT HAS ANY ACTIVE MODULES LEFT
+    $activeModulesCount = $user->modules()
+        ->wherePivotNull('completed_at')
+        ->count();
+
+    // IF NONE LEFT → PROMOTE TO OLD STUDENT
+    if ($activeModulesCount === 0) {
+        $oldStudentRoleId = \DB::table('user_roles')
+            ->where('role', 'old_student')
+            ->value('id');
+
+        $user->update([
+            'user_role_id' => $oldStudentRoleId,
         ]);
-
-        // Update pivot table
-        $module->users()->updateExistingPivot($user->id, [
-            'pass_status'  => $request->pass_status,
-            'completed_at' => now(),
-        ]);
-
-        /**
-         * 🔁 AUTO-PROMOTE STUDENT → OLD STUDENT
-         * When no active modules remain
-         */
-        $activeModulesRemaining = $user->modules()
-            ->wherePivotNull('completed_at')
-            ->count();
-
-        if ($activeModulesRemaining === 0) {
-            $oldStudentRoleId = UserRole::where('role', 'old_student')->value('id');
-            $user->update(['user_role_id' => $oldStudentRoleId]);
-        }
-
-        return back()->with('success', 'Student graded successfully.');
     }
+
+    return back()->with('success', 'Student graded successfully.');
+}
 
     /**
      * Reset student grade (PASS / FAIL → NULL)
