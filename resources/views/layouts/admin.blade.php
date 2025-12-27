@@ -2,82 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Admin Dashboard')</title>
+    <title>@yield('title', 'Admin Panel')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-100">
 
 <div class="flex min-h-screen">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-white shadow-lg">
-        <div class="p-6 text-xl font-bold text-indigo-600">
+    <aside class="w-64 bg-slate-900 text-slate-100 shadow-xl flex flex-col">
+
+        <!-- Logo -->
+        <div class="p-6 text-xl font-bold text-white">
             Admin Panel
         </div>
 
-        <nav class="mt-6 space-y-1">
+        <!-- Navigation -->
+        @php
+            $base = 'block w-full px-6 py-3 text-sm transition';
+            $active = 'bg-slate-700 text-white font-semibold';
+            $inactive = 'text-slate-300 hover:bg-slate-700 hover:text-white';
+        @endphp
 
-    <a href="{{ route('admin.dashboard') }}"
-       class="block px-6 py-3
-       {{ request()->routeIs('admin.dashboard') 
-            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
-            : 'hover:bg-indigo-50 text-gray-700' }}">
-        Dashboard
-    </a>
+        <nav class="flex-1 space-y-1">
 
-    <a href="{{ route('admin.modules.index') }}"
-       class="block px-6 py-3
-       {{ request()->routeIs('admin.modules.*') 
-            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
-            : 'hover:bg-indigo-50 text-gray-700' }}">
-        Modules
-    </a>
+            <a href="{{ route('admin.dashboard') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.dashboard') ? $active : $inactive }}">
+                Dashboard
+            </a>
 
-    <a href="{{ route('admin.teachers.index') }}"
-       class="block px-6 py-3
-       {{ request()->routeIs('admin.teachers.*') 
-            ? 'bg-indigo-100 text-indigo-700 font-semibold' 
-            : 'hover:bg-indigo-50 text-gray-700' }}">
-        Teachers
-    </a>
-    <a href="{{ route('admin.students.index') }}"
-    class="block px-6 py-3{{ request()->routeIs('admin.students.*')? 'bg-indigo-100 text-indigo-700 font-semibold': 'hover:bg-indigo-50 text-gray-700' }}">
-    Students
-    </a>
+            <a href="{{ route('admin.modules.index') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.modules.*') ? $active : $inactive }}">
+                Modules
+            </a>
 
-    <a href="{{ route('admin.old-students.index') }}"
-    class="block px-6 py-3{{ request()->routeIs('admin.old-students.*')? 'bg-indigo-100 text-indigo-700 font-semibold': 'hover:bg-indigo-50 text-gray-700' }}">
-    Old Students
-    </a>
+            <a href="{{ route('admin.teachers.index') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.teachers.*') ? $active : $inactive }}">
+                Teachers
+            </a>
 
-</nav>
+            <a href="{{ route('admin.students.index') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.students.*') ? $active : $inactive }}">
+                Students
+            </a>
+
+            <a href="{{ route('admin.old-students.index') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.old-students.*') ? $active : $inactive }}">
+                Old Students
+            </a>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-slate-700 text-sm text-slate-300">
+            Logged in as<br>
+            <span class="font-semibold text-white">
+                {{ auth()->user()->name }}
+            </span>
+        </div>
+
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1">
+    <main class="flex-1 flex flex-col">
 
-        <!-- TOPBAR -->
-        <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
-            <h1 class="text-lg font-semibold">
-                @yield('header', 'Dashboard')
+        <!-- TOP BAR -->
+        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-800">
+                @yield('header')
             </h1>
 
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-gray-600">
-                    {{ auth()->user()->name }}
-                </span>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="text-red-500 hover:underline">
-                        Logout
-                    </button>
-                </form>
-            </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="text-sm text-red-600 hover:underline">
+                    Logout
+                </button>
+            </form>
         </header>
 
         <!-- PAGE CONTENT -->
-        <section class="p-6">
+        <section class="p-8 flex-1">
             @yield('content')
         </section>
 

@@ -16,7 +16,6 @@ class Module extends Model
      */
     protected $fillable = [
         'module',     
-        'description',
         'is_active',
     ];
 

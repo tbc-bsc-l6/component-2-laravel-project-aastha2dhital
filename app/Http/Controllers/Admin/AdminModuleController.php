@@ -24,16 +24,16 @@ class AdminModuleController extends Controller
     {
     $validated = $request->validate(
         [
-            'module' => ['required', 'string', 'max:255', 'unique:modules,name'],
+            'module' => ['required', 'string', 'max:255', 'unique:modules,module'],
         ],
         [
             'module.required' => 'Module name is required.',
-            'module.unique' => 'This module already exists.',
+            'module.unique'   => 'This module already exists.',
         ]
     );
 
     Module::create([
-        'name' => $validated['module'],
+        'module'    => $validated['module'], // ✅ CORRECT COLUMN
         'is_active' => true,
     ]);
 
@@ -41,7 +41,6 @@ class AdminModuleController extends Controller
         ->route('admin.modules.index')
         ->with('success', 'Module created successfully.');
     }
-
 
     public function toggle(Module $module)
     {

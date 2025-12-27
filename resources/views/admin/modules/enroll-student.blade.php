@@ -1,41 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Enroll Student</title>
-</head>
-<body>
+<x-admin-layout>
+    <x-slot name="header">Enroll Student</x-slot>
+    <x-slot name="subheader">
+        Enroll a student into module: <strong>{{ $module->name }}</strong>
+    </x-slot>
 
-    <h2>
-        Enroll Student to: {{ $module->name }}
-    </h2>
+    <div class="max-w-xl bg-white rounded-xl shadow p-6">
 
-    @if(session('success'))
-        <p style="color: green;">
-            {{ session('success') }}
-        </p>
-    @endif
+        {{-- Validation / Errors --}}
+        @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-    <form method="POST" action="{{ route('admin.modules.enroll', $module->id) }}">
-        @csrf
+        <form method="POST" action="{{ route('admin.modules.enroll-student.store', $module) }}">
+            @csrf
 
-        <label>Select Student:</label><br><br>
+            {{-- Student Dropdown --}}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Select Student
+                </label>
 
-        <select name="student_id" required>
-            <option value="">-- Select Student --</option>
+                <select
+                    name="student_id"
+                    class="w-full border rounded p-2"
+                    required
+                >
+                    <option value="">-- Select a student --</option>
 
-            @foreach($students as $student)
-                <option value="{{ $student->id }}">
-                    {{ $student->name }} ({{ $student->email }})
-                </option>
-            @endforeach
-        </select>
+                    @foreach ($students as $student)
+                        <option value="{{ $student->id }}">
+                            {{ $student->name }} ({{ $student->email }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <br><br>
+            {{-- Actions --}}
+            <div class="flex justify-end gap-2">
+                <a
+                    href="{{ route('admin.modules.index') }}"
+                    class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">
+                    Cancel
+                </a>
 
-        <button type="submit">
-            Enroll Student
-        </button>
-    </form>
+                <button
+                    type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    Enroll Student
+                </button>
+            </div>
 
-</body>
-</html>
+        </form>
+    </div>
+</x-admin-layout>
