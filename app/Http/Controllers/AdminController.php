@@ -36,26 +36,36 @@ class AdminController extends Controller
 
     public function storeTeacher(Request $request)
     {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|min:6',
-    ]);
+    $validated = $request->validate(
+        [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+        ],
+        [
+            'name.required' => 'Name is required.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Please enter a valid email address (example: teacher@email.com).',
+            'email.unique' => 'This email is already registered.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters long.',
+        ]
+    );
 
     $teacherRoleId = \DB::table('user_roles')
         ->where('role', 'teacher')
         ->value('id');
 
     User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
         'user_role_id' => $teacherRoleId,
     ]);
 
     return redirect()
         ->route('admin.teachers.index')
-        ->with('success', 'Teacher created successfully.');
+        ->with('success', 'Teacher created successfully.');   
     }
 
     public function destroyTeacher(User $user)

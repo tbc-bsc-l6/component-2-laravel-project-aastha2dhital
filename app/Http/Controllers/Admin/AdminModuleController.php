@@ -22,18 +22,26 @@ class AdminModuleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'module' => 'required|string|max:255|unique:modules,module',
-        ]);
+    $validated = $request->validate(
+        [
+            'module' => ['required', 'string', 'max:255', 'unique:modules,name'],
+        ],
+        [
+            'module.required' => 'Module name is required.',
+            'module.unique' => 'This module already exists.',
+        ]
+    );
 
-        Module::create([
-            'module' => $request->module,
-        ]);
+    Module::create([
+        'name' => $validated['module'],
+        'is_active' => true,
+    ]);
 
-        return redirect()
-            ->route('admin.modules.index')
-            ->with('success', 'Module created successfully.');
+    return redirect()
+        ->route('admin.modules.index')
+        ->with('success', 'Module created successfully.');
     }
+
 
     public function toggle(Module $module)
     {
