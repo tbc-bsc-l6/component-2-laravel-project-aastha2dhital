@@ -1,51 +1,37 @@
-@extends('layouts.app')
+@extends('layouts.student')
 
 @section('content')
-    <div class="max-w-5xl mx-auto py-8">
+    <h1 class="text-2xl font-bold mb-6">Available Modules</h1>
 
-        <h2 class="font-semibold text-xl text-gray-800 mb-4">
-            Available Modules
-        </h2>
+    @if($modules->isEmpty())
+        <div class="bg-white p-6 rounded shadow">
+            <p class="text-gray-600">
+                No modules available for enrolment.
+            </p>
+        </div>
+    @else
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($modules as $module)
+                <div class="bg-white p-6 rounded shadow flex flex-col">
+                    <h2 class="text-lg font-semibold mb-2">
+                        {{ $module->module }}
+                    </h2>
 
-        {{-- Success / Error Messages --}}
-        @if (session('success'))
-            <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="mb-4 p-3 bg-red-100 text-red-800 rounded">
-                {{ $errors->first() }}
-            </div>
-        @endif
-
-        {{-- Modules List --}}
-        <div class="bg-white shadow rounded-lg divide-y">
-            @forelse ($modules as $module)
-                <div class="p-4 flex justify-between items-center">
-                    <div>
-                        <p class="font-medium">{{ $module->module }}</p>
-                        <p class="text-sm text-gray-500">
-                            {{ $module->activeStudentCount() }} / 10 students
-                        </p>
-                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        {{ $module->description }}
+                    </p>
 
                     <form method="POST"
-                          action="{{ route('student.modules.enroll', $module) }}">
+                          action="{{ route('student.modules.enroll', $module) }}"
+                          class="mt-auto">
                         @csrf
                         <button
-                            class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                            Enroll
+                            class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">
+                            Enrol
                         </button>
                     </form>
                 </div>
-            @empty
-                <div class="p-6 text-center text-gray-500">
-                    No modules available for enrollment.
-                </div>
-            @endforelse
+            @endforeach
         </div>
-
-    </div>
+    @endif
 @endsection

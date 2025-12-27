@@ -73,6 +73,9 @@ Route::middleware(['auth', 'role:student'])
     ->name('student.')
     ->group(function () {
 
+        Route::get('/dashboard', [StudentDashboardController::class, 'index'])
+            ->name('dashboard');
+
         Route::get('/modules', [StudentModuleController::class, 'index'])
             ->name('modules.index');
 
