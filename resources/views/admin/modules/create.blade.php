@@ -1,57 +1,37 @@
-<x-admin-layout>
-    <x-slot name="header">Create Module</x-slot>
-    <x-slot name="subheader">Add a new academic module</x-slot>
+@extends('layouts.admin')
 
-    <div class="max-w-xl bg-white rounded-xl shadow p-6">
+@section('title', 'Create Module')
+@section('header', 'Create Module')
 
-        {{-- Validation Errors --}}
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+@section('content')
 
-        <form method="POST" action="{{ route('admin.modules.store') }}">
-            @csrf
+<div class="max-w-xl bg-white rounded-xl shadow p-8">
+    <h2 class="text-xl font-semibold mb-6">Add New Module</h2>
 
-            {{-- Module Name --}}
-            <div class="mb-4">
-                <label
-                    for="module"
-                    class="block text-sm font-medium text-gray-700 mb-1">
-                    Module Name
-                </label>
+    @error('module')
+        <div class="mb-4 bg-red-100 text-red-700 p-3 rounded">
+            {{ $message }}
+        </div>
+    @enderror
 
-                <input
-                    type="text"
-                    id="module"
-                    name="module"
-                    value="{{ old('module') }}"
-                    placeholder="e.g. Web Application Development"
-                    class="w-full border rounded p-2 focus:ring focus:ring-indigo-200"
-                    required
-                >
-            </div>
+    <form method="POST" action="{{ route('admin.modules.store') }}">
+        @csrf
 
-            {{-- Actions --}}
-            <div class="flex justify-end gap-2">
-                <a
-                    href="{{ route('admin.modules.index') }}"
-                    class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">
-                    Cancel
-                </a>
+        <label class="block mb-2 text-sm font-medium">Module Name</label>
+        <input type="text"
+               name="module"
+               value="{{ old('module') }}"
+               class="w-full border rounded px-4 py-2 mb-6">
 
-                <button
-                    type="submit"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                    Create Module
-                </button>
-            </div>
+        <div class="flex justify-end gap-3">
+            <a href="{{ route('admin.modules.index') }}" class="px-4 py-2 border rounded">
+                Cancel
+            </a>
+            <button class="px-5 py-2 bg-indigo-600 text-white rounded">
+                Create Module
+            </button>
+        </div>
+    </form>
+</div>
 
-        </form>
-    </div>
-</x-admin-layout>
+@endsection

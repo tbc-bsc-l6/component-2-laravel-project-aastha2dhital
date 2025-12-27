@@ -5,68 +5,89 @@
 
 @section('content')
 
-{{-- HERO (same style as dashboard & modules) --}}
-<div class="mb-8 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-500 p-8 text-white shadow-lg">
-    <h2 class="text-3xl font-bold">Students</h2>
-    <p class="mt-2 text-indigo-100">
-        Manage active students in the system
+{{-- HERO --}}
+<div class="mb-8 rounded-2xl
+            bg-gradient-to-r from-slate-900 via-indigo-900 to-blue-900
+            p-8 text-white shadow-lg">
+
+    <h2 class="text-3xl font-extrabold tracking-wide">
+        Active Students
+    </h2>
+
+    <p class="mt-2 text-sm text-indigo-200 max-w-2xl">
+        View and manage all currently enrolled students.
+        Monitor student accounts, enrollment status, and
+        maintain accurate academic records.
     </p>
 </div>
 
-{{-- CARD --}}
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
-
-    {{-- CARD HEADER --}}
-    <div class="flex items-center justify-between px-6 py-4 border-b">
-        <h3 class="text-lg font-semibold text-gray-800">
+{{-- Top Action Bar --}}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h3 class="text-lg font-semibold text-gray-900">
             Student List
         </h3>
-
-        <a href="{{ route('admin.students.create') }}"
-           class="inline-flex items-center px-4 py-2 rounded-lg
-                  bg-indigo-600 text-white text-sm font-medium
-                  hover:bg-indigo-700 transition">
-            + Create Student
-        </a>
+        <p class="text-sm text-gray-600">
+            Registered and active students in the system
+        </p>
     </div>
 
-    {{-- TABLE --}}
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-gray-600">
-                <tr>
-                    <th class="px-6 py-4 text-left font-medium">Name</th>
-                    <th class="px-6 py-4 text-left font-medium">Email</th>
+    <a href="{{ route('admin.students.create') }}"
+       class="inline-flex items-center gap-2 rounded-lg
+              bg-indigo-600 px-5 py-2.5
+              text-sm font-medium text-white
+              shadow hover:bg-indigo-700 transition">
+        + Create Student
+    </a>
+</div>
+
+{{-- Students Table --}}
+@if ($students->count())
+<div class="overflow-hidden rounded-xl bg-white shadow">
+
+    <table class="w-full text-sm">
+        <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+            <tr>
+                <th class="px-6 py-4 text-left">Name</th>
+                <th class="px-6 py-4 text-left">Email</th>
+                <th class="px-6 py-4 text-left">Status</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+            @foreach ($students as $student)
+                <tr class="hover:bg-gray-50 transition">
+
+                    {{-- Name --}}
+                    <td class="px-6 py-4 font-medium text-gray-900">
+                        {{ $student->name }}
+                    </td>
+
+                    {{-- Email --}}
+                    <td class="px-6 py-4 text-gray-700">
+                        {{ $student->email }}
+                    </td>
+
+                    {{-- Status --}}
+                    <td class="px-6 py-4">
+                        <span
+                            class="inline-flex items-center rounded-full px-3 py-1
+                                   text-xs font-semibold
+                                   bg-green-100 text-green-700">
+                            Active
+                        </span>
+                    </td>
+
                 </tr>
-            </thead>
-
-            <tbody class="divide-y">
-                @forelse($students as $student)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            {{ $student->name }}
-                            <span class="ml-2 px-2 py-1 text-xs font-semibold
-                                         bg-green-100 text-green-700 rounded">
-                                Active
-                            </span>
-                        </td>
-
-                        <td class="px-6 py-4 text-gray-600">
-                            {{ $student->email }}
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="2"
-                            class="px-6 py-6 text-center text-gray-500">
-                            No students found.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            @endforeach
+        </tbody>
+    </table>
 
 </div>
+@else
+<div class="rounded-xl bg-white p-12 text-center shadow">
+    <p class="text-gray-500">No students found.</p>
+</div>
+@endif
 
 @endsection
