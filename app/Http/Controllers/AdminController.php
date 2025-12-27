@@ -84,10 +84,11 @@ class AdminController extends Controller
     public function oldStudents()
     {
         $students = User::whereHas('role', function ($q) {
-            $q->where('role', 'old_student');
-        })->get();
+            $q->where('role', 'student');
+        })
+        ->where('status', 'completed')
+        ->get();
 
-        return view('admin.old-students', compact('students'));
+        return view('admin.modules.old-students', compact('students'));
     }
 }
-
