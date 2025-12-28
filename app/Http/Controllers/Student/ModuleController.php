@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
 {
@@ -14,9 +15,11 @@ class ModuleController extends Controller
     {
         $student = auth()->user();
 
+        // Show only active modules NOT currently enrolled (active only)
         $modules = Module::where('is_active', true)
             ->whereDoesntHave('users', function ($q) use ($student) {
-                $q->where('users.id', $student->id);
+                $q->where('users.id', $student->id)
+                  ->whereNull('module_user.completed_at');
             })
             ->get();
 
@@ -24,60 +27,76 @@ class ModuleController extends Controller
     }
 
     /**
-     * Enroll student into module
+     * Enroll student into a module
      */
     public function enroll(Module $module)
-    {
-        $student = auth()->user();
+{
+    $student = auth()->user();
 
-        // Module capacity check (max 10 active students)
-        $activeStudentCount = $module->users()
-            ->wherePivotNull('completed_at')
-            ->count();
+    /*
+    |--------------------------------------------------------------------------
+    | RULE 1: Prevent ANY duplicate enrollment (DB-safe)
+    |--------------------------------------------------------------------------
+    */
+    $alreadyExists = DB::table('module_user')
+        ->where('user_id', $student->id)
+        ->where('module_id', $module->id)
+        ->exists();
 
-        if ($activeStudentCount >= 10) {
-            return back()->withErrors([
-                'capacity' => 'This module has reached its maximum capacity.'
-            ]);
-        }
-
-        // Student enrolment limit (max 4 active modules)
-        $activeModulesCount = $student->modules()
-            ->wherePivotNull('completed_at')
-            ->count();
-
-        if ($activeModulesCount >= 4) {
-            return back()->withErrors([
-                'limit' => 'You can only enrol in a maximum of 4 modules.'
-            ]);
-        }
-
-        // Prevent duplicate enrolment
-        if ($student->modules()->where('modules.id', $module->id)->exists()) {
-            return back()->withErrors([
-                'exists' => 'You are already enrolled in this module.'
-            ]);
-        }
-
-        // Enrol student
-        $student->modules()->attach($module->id, [
-            'enrolled_at' => now(),
-        ]);
-
-        return back()->with('success', 'Successfully enrolled in module.');
+    if ($alreadyExists) {
+        return back()->with(
+            'error',
+            'You have already enrolled in this module before.'
+        );
     }
 
-    /**
-     * Show completed modules (PASS / FAIL history)
-     */
-    public function history()
-    {
-        $student = auth()->user();
+    /*
+    |--------------------------------------------------------------------------
+    | RULE 2: Module capacity (max 10 ACTIVE students)
+    |--------------------------------------------------------------------------
+    */
+    $activeStudentCount = DB::table('module_user')
+        ->where('module_id', $module->id)
+        ->whereNull('completed_at')
+        ->count();
 
-        $modules = $student->modules()
-            ->wherePivotNotNull('completed_at')
-            ->get();
-
-        return view('student.modules.history', compact('modules'));
+    if ($activeStudentCount >= 10) {
+        return back()->with(
+            'error',
+            'This module has reached its maximum capacity.'
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RULE 3: Student enrollment limit (max 4 ACTIVE modules)
+    |--------------------------------------------------------------------------
+    */
+    $activeModulesCount = DB::table('module_user')
+        ->where('user_id', $student->id)
+        ->whereNull('completed_at')
+        ->count();
+
+    if ($activeModulesCount >= 4) {
+        return back()->with(
+            'error',
+            'You can only enrol in a maximum of 4 modules.'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENROLL STUDENT
+    |--------------------------------------------------------------------------
+    */
+    DB::table('module_user')->insert([
+        'user_id'     => $student->id,
+        'module_id'   => $module->id,
+        'enrolled_at' => now(),
+        'created_at'  => now(),
+        'updated_at'  => now(),
+    ]);
+
+    return back()->with('success', 'Successfully enrolled in module.');
+}
 }

@@ -10,7 +10,7 @@
 
 <div class="flex min-h-screen">
 
-    {{-- SIDEBAR --}}
+    {{-- ================= SIDEBAR ================= --}}
     <aside class="w-64 min-h-screen bg-gradient-to-b from-slate-900 to-slate-800
                   text-slate-100 shadow-xl flex flex-col">
 
@@ -59,22 +59,57 @@
         </div>
     </aside>
 
-    {{-- MAIN --}}
+    {{-- ================= MAIN ================= --}}
     <main class="flex-1 flex flex-col bg-gray-100">
 
-        <header class="bg-white border-b px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-semibold text-gray-800">
-                @yield('header')
-            </h1>
+        {{-- ===== HEADER ===== --}}
+        <header class="flex items-center justify-between px-8 py-4 bg-white border-b shadow-sm">
 
+            {{-- Page Title --}}
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900">
+                    @yield('title')
+                </h1>
+
+                @hasSection('subtitle')
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        @yield('subtitle')
+                    </p>
+                @endif
+            </div>
+
+            {{-- Logout --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="text-sm text-red-600 hover:underline">
+                <button
+                    type="submit"
+                    class="inline-flex items-center gap-2
+                           rounded-lg px-5 py-2
+                           text-sm font-semibold
+                           text-white
+                           bg-red-500
+                           hover:bg-red-600
+                           active:bg-red-700
+                           focus:outline-none focus:ring-2 focus:ring-red-400
+                           transition">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-4 w-4"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor"
+                         stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7" />
+                    </svg>
+
                     Logout
                 </button>
             </form>
+
         </header>
 
+        {{-- ===== PAGE CONTENT ===== --}}
         <section class="p-8 flex-1">
             @yield('content')
         </section>
@@ -82,5 +117,6 @@
     </main>
 
 </div>
+
 </body>
 </html>

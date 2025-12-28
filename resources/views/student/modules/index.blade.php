@@ -3,10 +3,24 @@
 @section('content')
 <div class="max-w-6xl mx-auto">
 
+    {{-- PAGE HEADER --}}
     <h1 class="text-2xl font-bold mb-1">Available Modules</h1>
     <p class="text-gray-500 mb-6">
         You can enroll in a maximum of <strong>4</strong> active modules at a time.
     </p>
+
+    {{-- FLASH MESSAGES --}}
+    @if(session('error'))
+        <div class="mb-4 p-3 bg-red-100 text-red-800 rounded">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
 
     @php
         $activeCount = auth()->user()
@@ -15,6 +29,7 @@
             ->count();
     @endphp
 
+    {{-- NO MODULES AVAILABLE --}}
     @if($modules->isEmpty())
         <div class="bg-white p-6 rounded shadow">
             @if($activeCount >= 4)
@@ -27,9 +42,15 @@
                 </p>
             @endif
         </div>
+
+    {{-- MODULE LIST --}}
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($modules as $module)
+                @php
+                    $isLimitReached = $activeCount >= 4;
+                @endphp
+
                 <div class="bg-white p-6 rounded shadow flex flex-col">
 
                     <h2 class="text-lg font-semibold mb-2">
@@ -46,12 +67,14 @@
                         @csrf
 
                         <button
-                            class="w-full py-2 rounded
-                                   {{ $activeCount >= 4
-                                        ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                        : 'bg-indigo-600 text-white hover:bg-indigo-700' }}"
-                            {{ $activeCount >= 4 ? 'disabled' : '' }}>
-                            Enrol
+                            type="submit"
+                            class="w-full py-2 rounded font-medium
+                                {{ $isLimitReached
+                                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                    : 'bg-indigo-600 text-white hover:bg-indigo-700' }}"
+                            {{ $isLimitReached ? 'disabled' : '' }}>
+                            
+                            {{ $isLimitReached ? 'Limit Reached' : 'Enrol' }}
                         </button>
                     </form>
 
@@ -59,5 +82,6 @@
             @endforeach
         </div>
     @endif
+
 </div>
 @endsection

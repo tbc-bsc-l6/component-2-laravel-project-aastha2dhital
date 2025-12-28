@@ -137,7 +137,7 @@ class AdminController extends Controller
             })
             ->get();
 
-        return view('admin.old-students.index', compact('students'));
+        return view('admin.old-students', compact('students'));
     }
 
     public function createStudent()
