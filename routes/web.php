@@ -6,8 +6,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
-use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\CompletedModuleController;
+use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +130,10 @@ Route::middleware(['auth', 'role:student'])
 
         Route::post('/modules/{module}/enroll', [StudentModuleController::class, 'enroll'])
             ->name('modules.enroll');
+
+        // ✅ FIXED: COMPLETED COURSES ROUTE
+        Route::get('/completed', [CompletedModuleController::class, 'index'])
+            ->name('completed');
     });
 
 /*

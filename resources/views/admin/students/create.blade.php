@@ -57,7 +57,6 @@
                 name="email"
                 value="{{ old('email') }}"
                 class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                placeholder="student@example.com"
                 required
             >
         </div>
