@@ -3,98 +3,72 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\Module;
 use Illuminate\Http\Request;
+use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
 {
-    /**
-     * Show available modules for enrollment
-     */
     public function index(Request $request)
     {
-        $query = Module::query()
-            ->where('is_active', true)
-            ->withCount([
-                'users as users_count' => function ($q) {
-                    $q->whereNull('completed_at'); // only active students
-                }
-            ]);
+    $student = auth()->user();
 
-        // SEARCH (FIXED)
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
+    // Count active modules (max 4)
+    $activeCount = DB::table('module_user')
+        ->where('user_id', $student->id)
+        ->whereNull('completed_at')
+        ->count();
 
-        $modules = $query->get()->map(function ($module) {
+    // Base query
+    $query = DB::table('modules')
+        ->where('is_active', true);
 
-            // FIXED RULES
-            $module->max_students = 10;
-
-            // Check if current student already enrolled
-            $module->already_enrolled = DB::table('module_user')
-                ->where('module_id', $module->id)
-                ->where('user_id', auth()->id())
-                ->whereNull('completed_at')
-                ->exists();
-
-            // Check module capacity
-            $module->is_full = $module->users_count >= $module->max_students;
-
-            return $module;
-        });
-
-        return view('student.modules.index', compact('modules'));
+    // 🔍 SEARCH LOGIC (REAL FIX)
+    if ($request->filled('search')) {
+        $query->where('module', 'like', '%' . $request->search . '%');
     }
 
-    /**
-     * Enroll student into a module
-     */
-    public function enroll(Module $module)
-    {
-        $student = auth()->user();
+    $modules = $query->get()->map(function ($module) use ($student) {
 
-        // Already enrolled check
-        $alreadyExists = DB::table('module_user')
-            ->where('user_id', $student->id)
+        $module->already_enrolled = DB::table('module_user')
             ->where('module_id', $module->id)
+            ->where('user_id', $student->id)
             ->whereNull('completed_at')
             ->exists();
 
-        if ($alreadyExists) {
-            return back()->with('error', 'You are already enrolled in this module.');
-        }
-
-        // Module capacity (max 10 active students)
-        $activeStudentCount = DB::table('module_user')
+        $activeStudents = DB::table('module_user')
             ->where('module_id', $module->id)
             ->whereNull('completed_at')
             ->count();
 
-        if ($activeStudentCount >= 10) {
-            return back()->with('error', 'This module has reached its maximum capacity.');
-        }
+        $module->is_full = $activeStudents >= 10;
 
-        // Student enrollment limit (max 4 active modules)
-        $activeModulesCount = DB::table('module_user')
-            ->where('user_id', $student->id)
-            ->whereNull('completed_at')
-            ->count();
+        return $module;
+    });
 
-        if ($activeModulesCount >= 4) {
-            return back()->with('error', 'You can only enroll in a maximum of 4 modules.');
-        }
+    return view('student.modules.index', [
+        'modules'     => $modules,
+        'activeCount' => $activeCount,
+        'search'      => $request->search,
+    ]);
+    }
 
-        // Enroll student
-        DB::table('module_user')->insert([
-            'user_id'     => $student->id,
-            'module_id'   => $module->id,
-            'enrolled_at' => now(),
-            'created_at'  => now(),
-            'updated_at'  => now(),
-        ]);
+    //  Old student / completed module history
+    public function history()
+    {
+        $completedModules = DB::table('module_user')
+            ->join('modules', 'modules.id', '=', 'module_user.module_id')
+            ->where('module_user.user_id', auth()->id())
+            ->whereNotNull('module_user.completed_at')
+            ->select(
+                'modules.name',
+                'modules.code',
+                'module_user.completed_at',
+                'module_user.pass_status'
+            )
+            ->orderBy('module_user.completed_at', 'desc')
+            ->get();
 
-        return back()->with('success', 'Successfully enrolled in module.');
+        return view('student.history', compact('completedModules'));
     }
 }

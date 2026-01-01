@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminModuleController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\CompletedModuleController;
@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard Redirect (Role Based)
+| Dashboard Redirect (ROLE BASED)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
@@ -57,19 +57,13 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
-        /*
-        |------------------------
-        | Modules
-        |------------------------
-        */
+        // Modules
         Route::get('/modules', [AdminModuleController::class, 'index'])->name('modules.index');
         Route::get('/modules/create', [AdminModuleController::class, 'create'])->name('modules.create');
         Route::post('/modules', [AdminModuleController::class, 'store'])->name('modules.store');
-
         Route::get('/modules/{module}', [AdminModuleController::class, 'show'])->name('modules.show');
         Route::get('/modules/{module}/edit', [AdminModuleController::class, 'edit'])->name('modules.edit');
         Route::put('/modules/{module}', [AdminModuleController::class, 'update'])->name('modules.update');
@@ -81,29 +75,20 @@ Route::middleware(['auth', 'role:admin'])
         Route::delete('/modules/{module}/students/{user}', [AdminModuleController::class, 'removeStudent'])
             ->name('modules.students.remove');
 
-        // Enroll Student into Module
         Route::get('/modules/{module}/enroll-student', [AdminModuleController::class, 'enrollStudentForm'])
             ->name('modules.enroll-student');
 
         Route::post('/modules/{module}/enroll-student', [AdminModuleController::class, 'enrollStudent'])
             ->name('modules.enroll-student.store');
 
-        /*
-        |------------------------
-        | Teachers
-        |------------------------
-        */
+        // Teachers
         Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers.index');
         Route::get('/teachers/create', [AdminController::class, 'createTeacher'])->name('teachers.create');
         Route::post('/teachers', [AdminController::class, 'storeTeacher'])->name('teachers.store');
         Route::delete('/teachers/{user}', [AdminController::class, 'destroyTeacher'])
             ->name('teachers.destroy');
 
-        /*
-        |------------------------
-        | Students
-        |------------------------
-        */
+        // Students
         Route::get('/students', [AdminController::class, 'students'])->name('students.index');
         Route::get('/students/create', [AdminController::class, 'createStudent'])->name('students.create');
         Route::post('/students', [AdminController::class, 'storeStudent'])->name('students.store');
@@ -114,7 +99,7 @@ Route::middleware(['auth', 'role:admin'])
 
 /*
 |--------------------------------------------------------------------------
-| STUDENT ROUTES (ACTIVE)
+| STUDENT ROUTES (ACTIVE STUDENT)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:student'])
@@ -122,6 +107,7 @@ Route::middleware(['auth', 'role:student'])
     ->name('student.')
     ->group(function () {
 
+        // Optional dashboard (not used in redirect, kept for extension)
         Route::get('/dashboard', [StudentDashboardController::class, 'index'])
             ->name('dashboard');
 
@@ -131,14 +117,13 @@ Route::middleware(['auth', 'role:student'])
         Route::post('/modules/{module}/enroll', [StudentModuleController::class, 'enroll'])
             ->name('modules.enroll');
 
-        // ✅ FIXED: COMPLETED COURSES ROUTE
         Route::get('/completed', [CompletedModuleController::class, 'index'])
             ->name('completed');
     });
 
 /*
 |--------------------------------------------------------------------------
-| OLD STUDENT ROUTES (HISTORY)
+| OLD STUDENT ROUTES (HISTORY ONLY)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:old_student'])

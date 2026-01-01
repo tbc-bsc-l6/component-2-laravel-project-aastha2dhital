@@ -15,7 +15,8 @@ class Module extends Model
      * Mass assignable attributes
      */
     protected $fillable = [
-        'module',     
+        'module_name',
+        'module_code',
         'is_active',
     ];
 
@@ -38,7 +39,7 @@ class Module extends Model
     }
 
     /**
-     * Count active (not completed) students
+     * Active (not completed) students count
      */
     public function activeStudentCount(): int
     {
@@ -48,7 +49,7 @@ class Module extends Model
     }
 
     /**
-     * Check if module has available seats
+     * Module capacity check (max 10 students)
      */
     public function hasAvailableSeat(): bool
     {
@@ -56,7 +57,7 @@ class Module extends Model
     }
 
     /**
-     * Check if module can accept new enrolments
+     * Can accept new enrollments?
      */
     public function canAcceptEnrollment(): bool
     {

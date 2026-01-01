@@ -1,17 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
-
-/* Primary academic font */
-body {
-    font-family: 'Lora', serif;
-}
-
-/* Keep UI consistent */
-button,
-input,
-textarea {
-    font-family: 'Lora', serif;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================= STUDENT DASHBOARD THEME ================= */
+
+.student-gradient {
+    background: linear-gradient(
+        180deg,
+        #0CCDA3 0%,
+        #C1FCD3 100%
+    );
+}
+
+/* Clean white cards with accent */
+.student-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid rgba(236, 64, 122, 0.25);
+}
+
+.student-card-accent {
+    border-left: 6px solid #EC407A;
+}
+
+/* ================= STUDENT UI POLISH ================= */
+
+/* Header */
+.student-header {
+    padding: 3rem 3.5rem;
+    border-radius: 1.75rem;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+/* Cards */
+.student-card {
+    background: linear-gradient(
+        180deg,
+        rgba(12, 205, 163, 0.08) 0%,
+        rgba(193, 252, 211, 0.25) 100%
+    );
+    border-radius: 1.25rem;
+    border: 1px solid rgba(12, 205, 163, 0.25);
+    padding: 1.1rem 1.25rem;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+/* Hover effect */
+.student-card:hover {
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Card title */
+.student-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: #0f172a;
+}
+
+/* Status badge */
+.student-card span {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+}
+
+/* Small enroll button */
+.student-enroll-btn {
+    padding: 0.35rem 0.9rem;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+}

@@ -1,62 +1,49 @@
-@extends('layouts.student')
+<x-student-layout>
 
-@section('content')
-<div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold text-slate-800 mb-6">
+        Completed Modules History
+    </h2>
 
-    <h1 class="text-2xl font-bold mb-1">Completed Modules</h1>
-    <p class="text-gray-500 mb-6">
-        Your academic history and results
-    </p>
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-    @if($modules->isEmpty())
-        <div class="bg-white p-6 rounded shadow">
-            <p class="text-gray-600">
-                You have not completed any modules yet.
-            </p>
-        </div>
-    @else
-        <div class="bg-white rounded shadow overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-100 text-gray-600">
-                    <tr>
-                        <th class="px-4 py-3 text-left">Module</th>
-                        <th class="px-4 py-3 text-left">Enrolled At</th>
-                        <th class="px-4 py-3 text-left">Completed At</th>
-                        <th class="px-4 py-3 text-left">Result</th>
+        <table class="w-full text-sm">
+            <thead class="bg-slate-100">
+                <tr>
+                    <th class="p-3 text-left">Module</th>
+                    <th class="p-3 text-left">Code</th>
+                    <th class="p-3 text-left">Result</th>
+                    <th class="p-3 text-left">Completed On</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($completedModules as $module)
+                    <tr class="border-t">
+                        <td class="p-3">{{ $module->name }}</td>
+                        <td class="p-3">{{ $module->code }}</td>
+
+                        <td class="p-3 font-semibold
+                            {{ $module->pass_status === 'pass'
+                                ? 'text-green-600'
+                                : 'text-red-600' }}">
+                            {{ strtoupper($module->pass_status) }}
+                        </td>
+
+                        <td class="p-3">
+                            {{ \Carbon\Carbon::parse($module->completed_at)->format('d M Y') }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach($modules as $module)
-                        <tr class="border-t hover:bg-gray-50">
-                            <td class="px-4 py-3 font-medium">
-                                {{ $module->module }}
-                            </td>
+                @empty
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-slate-500">
+                            No completed modules found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
 
-                            <td class="px-4 py-3 text-gray-600">
-                                {{ optional($module->pivot->enrolled_at)->format('d M Y') }}
-                            </td>
+        </table>
 
-                            <td class="px-4 py-3 text-gray-600">
-                                {{ optional($module->pivot->completed_at)->format('d M Y') }}
-                            </td>
+    </div>
 
-                            <td class="px-4 py-3">
-                                @if(strtolower($module->pivot->pass_status) === 'pass')
-                                    <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                                        PASS
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700">
-                                        FAIL
-                                    </span>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
-
-</div>
-@endsection
+</x-student-layout>

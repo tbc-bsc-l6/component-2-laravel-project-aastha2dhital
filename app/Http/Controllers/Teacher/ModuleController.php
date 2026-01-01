@@ -23,11 +23,11 @@ class ModuleController extends Controller
     }
 
     /**
-     * Show students enrolled in a module
+     * Show ACTIVE students enrolled in a module
      */
     public function show(Request $request, Module $module)
     {
-        // Ensure teacher is assigned to this module
+        //  Ensure teacher is assigned to this module
         abort_unless(
             $module->teachers()->where('users.id', auth()->id())->exists(),
             403
@@ -36,23 +36,23 @@ class ModuleController extends Controller
         $search = $request->query('search');
 
         $students = $module->users()
-            ->wherePivotNull('completed_at') // active students only
+            ->wherePivotNull('completed_at') // ACTIVE students only
             ->when($search, function ($query) use ($search) {
                 $query->where('users.name', 'like', "%{$search}%")
                       ->orWhere('users.email', 'like', "%{$search}%");
             })
-            ->withPivot(['enrolled_at', 'pass_status', 'completed_at'])
+            ->withPivot(['created_at']) // enrolled date
             ->get();
 
         return view('teacher.modules.show', compact('module', 'students', 'search'));
     }
 
     /**
-     * Grade student PASS / FAIL
+     * Grade a student (PASS / FAIL)
      */
     public function grade(Request $request, Module $module, User $user)
     {
-        // ✅ SECURITY: ensure teacher owns module
+        // Ensure teacher owns module
         abort_unless(
             $module->teachers()->where('users.id', auth()->id())->exists(),
             403
@@ -68,13 +68,13 @@ class ModuleController extends Controller
             'pass_status' => 'required|in:pass,fail',
         ]);
 
-        // ✅ FIX: normalize to DB constraint (PASS / FAIL)
+        // normalize to DB constraint
         $module->users()->updateExistingPivot($user->id, [
-            'pass_status'  => strtoupper($request->pass_status),
+            'pass_status'  => strtoupper($request->pass_status), // PASS / FAIL
             'completed_at' => now(),
         ]);
 
-        // Check if student has any active modules left
+        // Check if student has any ACTIVE modules left
         $activeModulesCount = $user->modules()
             ->wherePivotNull('completed_at')
             ->count();
@@ -85,9 +85,11 @@ class ModuleController extends Controller
                 ->where('role', 'old_student')
                 ->value('id');
 
-            $user->update([
-                'user_role_id' => $oldStudentRoleId,
-            ]);
+            if ($oldStudentRoleId) {
+                $user->update([
+                    'user_role_id' => $oldStudentRoleId,
+                ]);
+            }
         }
 
         return back()->with('success', 'Student graded successfully.');
@@ -98,7 +100,7 @@ class ModuleController extends Controller
      */
     public function resetGrade(Module $module, User $user)
     {
-        // Ensure teacher owns module
+        //  Ensure teacher owns module
         abort_unless(
             $module->teachers()->where('users.id', auth()->id())->exists(),
             403
