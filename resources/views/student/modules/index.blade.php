@@ -1,6 +1,6 @@
 <x-student-layout>
 
-    <!-- ================= SEARCH ================= -->
+    <!-- ================= SEARCH (AVAILABLE MODULES ONLY) ================= -->
     <form method="GET"
           action="{{ route('student.modules.index') }}"
           class="mb-8 flex max-w-xl items-center gap-3">
@@ -23,79 +23,77 @@
     </form>
 
     <!-- ================= WARNINGS ================= -->
-    @if(request('search') && $modules->isEmpty())
-        <div class="mb-6 rounded-xl border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-            ⚠️ Module not available
-        </div>
-    @endif
+    @if($enrolledModules->count() >= 4)
 
-    @if(!request('search') && $activeCount >= 4)
         <div class="mb-6 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
             ⚠️ You have reached the maximum of 4 active modules.
+            Enrollment is disabled.
         </div>
     @endif
 
-    <!-- ================= MODULE CARDS ================= -->
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- ================= MY MODULES ================= -->
+    <h3 class="mb-4 text-lg font-semibold">My Modules</h3>
 
-        @forelse($modules as $module)
+    @if($enrolledModules->isEmpty())
+        <p class="mb-8 text-gray-500">You are not enrolled in any modules.</p>
+    @else
+        <div class="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach($enrolledModules as $module)
+                <div class="student-card rounded-xl bg-white p-5 shadow">
+                    <span class="mb-2 inline-block rounded-full bg-blue-100 px-3 py-1
+                                 text-xs font-semibold text-blue-700">
+                        Enrolled
+                    </span>
 
-            <div class="student-card shadow-sm">
-
-                <!-- STATUS -->
-                <div class="mb-2">
-                    @if($module->already_enrolled)
-                        <span class="bg-gray-200 text-gray-700">
-                            Enrolled
-                        </span>
-                    @elseif($module->is_full)
-                        <span class="bg-red-200 text-red-800">
-                            Full
-                        </span>
-                    @else
-                        <span class="bg-green-200 text-green-800">
-                            Available
-                        </span>
-                    @endif
+                    <h3 class="text-base font-semibold text-slate-800">
+                        {{ $module->module }}
+                    </h3>
                 </div>
+            @endforeach
+        </div>
+    @endif
 
-                <!-- MODULE TITLE -->
-                <h3>
-                    {{ $module->module }}
-                </h3>
+    {{-- AVAILABLE MODULES --}}
+<div class="mt-10">
+    <h3 class="mb-4 text-lg font-semibold text-gray-800">
+        Available Modules
+    </h3>
 
-                <!-- ACTION -->
-                <div class="mt-4 flex justify-end">
-                    @if(!$module->already_enrolled && !$module->is_full && $activeCount < 4)
-                        <form method="POST"
-                              action="{{ route('student.modules.enroll', $module->id) }}">
-                            @csrf
-                            <button
-                                class="student-enroll-btn bg-gradient-to-r
-                                       from-emerald-500 to-teal-400
-                                       text-white font-semibold
-                                       hover:opacity-90 transition">
-                                Enroll
-                            </button>
-                        </form>
-                    @else
+    @if($availableModules->isEmpty())
+        <div class="rounded-lg bg-white p-6 text-center text-gray-500 shadow">
+            No modules available.
+        </div>
+    @else
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach($availableModules as $module)
+                <div class="rounded-2xl bg-white p-6 shadow hover:shadow-lg transition">
+
+                    {{-- MODULE NAME --}}
+                    <h4 class="text-xl font-bold text-gray-800">
+                        {{ $module->name }}
+                    </h4>
+
+                    {{-- OPTIONAL INFO --}}
+                    <p class="mt-2 text-sm text-gray-600">
+                        Capacity: {{ $module->students_count ?? $module->students()->count() }} / 10
+                    </p>
+
+                    {{-- ENROLL BUTTON --}}
+                    <form method="POST"
+                          action="{{ route('student.modules.enrol', $module->id) }}"
+                          class="mt-4">
+                        @csrf
                         <button
-                            disabled
-                            class="student-enroll-btn bg-gray-300
-                                   text-gray-600 cursor-not-allowed">
-                            Enroll
+                            class="w-full rounded-xl bg-emerald-500 px-4 py-2
+                                   font-semibold text-white hover:bg-emerald-600 transition">
+                            Enrol
                         </button>
-                    @endif
+                    </form>
+
                 </div>
-
-            </div>
-
-        @empty
-            <div class="col-span-full rounded-xl bg-white p-10 text-center text-gray-500 shadow">
-                No modules found.
-            </div>
-        @endforelse
-
-    </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 
 </x-student-layout>

@@ -21,19 +21,32 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Dashboard Redirect (ROLE BASED)
+| Dashboard Redirect (ROLE + STATE BASED)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
-    $role = auth()->user()->role->role;
+    $user = auth()->user();
 
-    return match ($role) {
-        'admin'       => redirect()->route('admin.dashboard'),
-        'teacher'     => redirect()->route('teacher.modules.index'),
-        'student'     => redirect()->route('student.modules.index'),
-        'old_student' => redirect()->route('student.history'),
-        default       => abort(403),
-    };
+    if ($user->role->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->role->role === 'teacher') {
+        return redirect()->route('teacher.modules.index');
+    }
+
+    if ($user->role->role === 'student') {
+
+        $hasActiveModules = $user->modules()
+            ->whereNull('module_user.completed_at')
+            ->exists();
+
+        return $hasActiveModules
+            ? redirect()->route('student.modules.index')
+            : redirect()->route('student.history');
+    }
+
+    abort(403);
 })->name('dashboard');
 
 /*
@@ -69,17 +82,13 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/modules/{module}', [AdminModuleController::class, 'update'])->name('modules.update');
         Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])->name('modules.toggle');
 
-        Route::get('/modules/{module}/students', [AdminModuleController::class, 'students'])
+        Route::get('/modules/{module}/students',
+            [AdminModuleController::class, 'students'])
             ->name('modules.students');
 
-        Route::delete('/modules/{module}/students/{user}', [AdminModuleController::class, 'removeStudent'])
+        Route::delete('/modules/{module}/students/{user}',
+            [AdminModuleController::class, 'removeStudent'])
             ->name('modules.students.remove');
-
-        Route::get('/modules/{module}/enroll-student', [AdminModuleController::class, 'enrollStudentForm'])
-            ->name('modules.enroll-student');
-
-        Route::post('/modules/{module}/enroll-student', [AdminModuleController::class, 'enrollStudent'])
-            ->name('modules.enroll-student.store');
 
         // Teachers
         Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers.index');
@@ -89,9 +98,8 @@ Route::middleware(['auth', 'role:admin'])
             ->name('teachers.destroy');
 
         // Students
-        Route::get('/students', [AdminController::class, 'students'])->name('students.index');
-        Route::get('/students/create', [AdminController::class, 'createStudent'])->name('students.create');
-        Route::post('/students', [AdminController::class, 'storeStudent'])->name('students.store');
+        Route::get('/students', [AdminController::class, 'students'])
+            ->name('students.index');
 
         Route::get('/old-students', [AdminController::class, 'oldStudents'])
             ->name('old-students.index');
@@ -99,7 +107,7 @@ Route::middleware(['auth', 'role:admin'])
 
 /*
 |--------------------------------------------------------------------------
-| STUDENT ROUTES (ACTIVE STUDENT)
+| STUDENT ROUTES
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:student'])
@@ -107,29 +115,18 @@ Route::middleware(['auth', 'role:student'])
     ->name('student.')
     ->group(function () {
 
-        // Optional dashboard (not used in redirect, kept for extension)
         Route::get('/dashboard', [StudentDashboardController::class, 'index'])
             ->name('dashboard');
 
         Route::get('/modules', [StudentModuleController::class, 'index'])
             ->name('modules.index');
 
-        Route::post('/modules/{module}/enroll', [StudentModuleController::class, 'enroll'])
-            ->name('modules.enroll');
+        // ✅ FIXED: enrol (British spelling)
+        Route::post('/modules/{module}/enrol', [StudentModuleController::class, 'enrol'])
+            ->name('modules.enrol');
 
         Route::get('/completed', [CompletedModuleController::class, 'index'])
             ->name('completed');
-    });
-
-/*
-|--------------------------------------------------------------------------
-| OLD STUDENT ROUTES (HISTORY ONLY)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'role:old_student'])
-    ->prefix('student')
-    ->name('student.')
-    ->group(function () {
 
         Route::get('/history', [StudentModuleController::class, 'history'])
             ->name('history');
@@ -160,4 +157,4 @@ Route::middleware(['auth', 'role:teacher'])
             ->name('modules.reset');
     });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

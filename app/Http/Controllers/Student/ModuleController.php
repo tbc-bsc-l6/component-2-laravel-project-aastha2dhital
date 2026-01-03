@@ -3,72 +3,85 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Module;
-use Illuminate\Support\Facades\DB;
 
 class ModuleController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Student module page:
+     * - Active enrolled modules
+     * - Available modules
+     */
+    public function index()
     {
-    $student = auth()->user();
+        $student = auth()->user();
 
-    // Count active modules (max 4)
-    $activeCount = DB::table('module_user')
-        ->where('user_id', $student->id)
-        ->whereNull('completed_at')
-        ->count();
-
-    // Base query
-    $query = DB::table('modules')
-        ->where('is_active', true);
-
-    // 🔍 SEARCH LOGIC (REAL FIX)
-    if ($request->filled('search')) {
-        $query->where('module', 'like', '%' . $request->search . '%');
-    }
-
-    $modules = $query->get()->map(function ($module) use ($student) {
-
-        $module->already_enrolled = DB::table('module_user')
-            ->where('module_id', $module->id)
-            ->where('user_id', $student->id)
-            ->whereNull('completed_at')
-            ->exists();
-
-        $activeStudents = DB::table('module_user')
-            ->where('module_id', $module->id)
-            ->whereNull('completed_at')
-            ->count();
-
-        $module->is_full = $activeStudents >= 10;
-
-        return $module;
-    });
-
-    return view('student.modules.index', [
-        'modules'     => $modules,
-        'activeCount' => $activeCount,
-        'search'      => $request->search,
-    ]);
-    }
-
-    //  Old student / completed module history
-    public function history()
-    {
-        $completedModules = DB::table('module_user')
-            ->join('modules', 'modules.id', '=', 'module_user.module_id')
-            ->where('module_user.user_id', auth()->id())
-            ->whereNotNull('module_user.completed_at')
-            ->select(
-                'modules.name',
-                'modules.code',
-                'module_user.completed_at',
-                'module_user.pass_status'
-            )
-            ->orderBy('module_user.completed_at', 'desc')
+        // Active enrolled modules
+        $enrolledModules = $student->modules()
+            ->wherePivotNull('completed_at')
             ->get();
 
-        return view('student.history', compact('completedModules'));
+        // Available modules
+        $availableModules = Module::where('is_active', 1)
+            ->whereDoesntHave('students', function ($q) use ($student) {
+                $q->where('user_id', $student->id)
+                  ->whereNull('completed_at');
+            })
+            ->withCount('students')
+            ->get()
+            ->filter(fn ($module) => $module->students_count < 10);
+
+        return view('student.modules.index', compact(
+            'enrolledModules',
+            'availableModules'
+        ));
+    }
+
+    /**
+     * Enrol student in a module
+     */
+    public function enrol(Module $module)
+    {
+        $student = auth()->user();
+
+        // RULE 1: Max 4 active modules
+        $activeModules = $student->modules()
+            ->wherePivotNull('completed_at')
+            ->count();
+
+        if ($activeModules >= 4) {
+            return back()->with('error', 'You have reached the maximum of 4 active modules.');
+        }
+
+        // RULE 2: Module capacity (max 10 students)
+        if (! $module->hasAvailableSeat()) {
+            return back()->with('error', 'This module is already full.');
+        }
+
+        // RULE 3: Prevent duplicate enrolment
+        if ($student->modules()->where('module_id', $module->id)->exists()) {
+            return back()->with('error', 'You are already enrolled in this module.');
+        }
+
+        // Enrol student
+        $student->modules()->attach($module->id, [
+            'enrolled_at' => now(),
+        ]);
+
+        return back()->with('success', 'Successfully enrolled in module.');
+    }
+
+    /**
+     * Completed modules (Old Student view)
+     */
+    public function history()
+    {
+        $student = auth()->user();
+
+        $completedModules = $student->modules()
+            ->wherePivotNotNull('completed_at')
+            ->get();
+
+        return view('student.modules.history', compact('completedModules'));
     }
 }

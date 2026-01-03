@@ -31,14 +31,6 @@
             Registered and active students in the system
         </p>
     </div>
-
-    <a href="{{ route('admin.students.create') }}"
-       class="inline-flex items-center gap-2 rounded-lg
-              bg-indigo-600 px-5 py-2.5
-              text-sm font-medium text-white
-              shadow hover:bg-indigo-700 transition">
-        + Create Student
-    </a>
 </div>
 
 {{-- Students Table --}}

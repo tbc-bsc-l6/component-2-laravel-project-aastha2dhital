@@ -84,15 +84,6 @@
 
                     {{-- Actions --}}
                     <td class="px-6 py-4 text-right space-x-2">
-
-                        <a href="{{ route('admin.modules.enroll-student', $module) }}"
-                           class="inline-flex items-center rounded-md px-3 py-1.5
-                                  text-xs font-medium
-                                  bg-indigo-100 text-indigo-700
-                                  hover:bg-indigo-200 transition">
-                            Enroll Student
-                        </a>
-
                         <form method="POST"
                               action="{{ route('admin.modules.toggle', $module) }}"
                               class="inline">

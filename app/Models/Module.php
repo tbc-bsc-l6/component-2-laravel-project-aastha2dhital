@@ -11,12 +11,8 @@ class Module extends Model
 {
     use HasFactory;
 
-    /**
-     * Mass assignable attributes
-     */
     protected $fillable = [
-        'module_name',
-        'module_code',
+        'module',
         'is_active',
     ];
 
@@ -25,31 +21,41 @@ class Module extends Model
      */
     public function teachers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'module_teacher');
+        return $this->belongsToMany(
+            User::class,
+            'module_teacher',
+            'module_id',
+            'teacher_id'
+        )->withTimestamps();
     }
 
     /**
      * Students enrolled in this module
      */
-    public function users(): BelongsToMany
+    public function students(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
-            ->withPivot(['enrolled_at', 'completed_at', 'pass_status'])
-            ->withTimestamps();
+        return $this->belongsToMany(
+            User::class,
+            'module_user',   // ✅ CONFIRMED pivot table
+            'module_id',
+            'user_id'
+        )
+        ->withPivot(['completed_at', 'grade'])
+        ->withTimestamps();
     }
 
     /**
-     * Active (not completed) students count
+     * Count only active (not completed) students
      */
     public function activeStudentCount(): int
     {
-        return $this->users()
+        return $this->students()
             ->wherePivotNull('completed_at')
             ->count();
     }
 
     /**
-     * Module capacity check (max 10 students)
+     * Capacity rule (max 10 students)
      */
     public function hasAvailableSeat(): bool
     {
@@ -57,7 +63,7 @@ class Module extends Model
     }
 
     /**
-     * Can accept new enrollments?
+     * Can this module accept new enrolments?
      */
     public function canAcceptEnrollment(): bool
     {
