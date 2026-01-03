@@ -3,18 +3,30 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
-// Admin
+/*
+|--------------------------------------------------------------------------
+| Admin Controllers
+|--------------------------------------------------------------------------
+*/
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 
-// Student
+/*
+|--------------------------------------------------------------------------
+| Student Controllers
+|--------------------------------------------------------------------------
+*/
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\CompletedModuleController;
 
-// Teacher
+/*
+|--------------------------------------------------------------------------
+| Teacher Controllers
+|--------------------------------------------------------------------------
+*/
 use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 
 /*
@@ -43,9 +55,8 @@ Route::middleware('auth')->get('/dashboard', function () {
     }
 
     if ($user->role->role === 'student') {
-        $hasActiveModules = $user->modules()
-            ->whereNull('module_user.completed_at')
-            ->exists();
+        // 🔑 assignment-correct logic
+        $hasActiveModules = $user->activeEnrollments()->exists();
 
         return $hasActiveModules
             ? redirect()->route('student.modules.index')
@@ -61,9 +72,14 @@ Route::middleware('auth')->get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
 /*
@@ -107,11 +123,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])
             ->name('modules.toggle');
 
-        // ✅ ARCHIVE / RESTORE (NEW – REQUIRED)
+        // Archive / restore
         Route::patch('/modules/{module}/archive', [AdminModuleController::class, 'archive'])
             ->name('modules.archive');
 
-        // Students in module
+        // Students in a module
         Route::get('/modules/{module}/students', [AdminModuleController::class, 'students'])
             ->name('modules.students');
 
@@ -150,8 +166,8 @@ Route::middleware(['auth', 'role:admin'])
         /* =========================
            Old Students
         ========================= */
-        Route::get('/old-students', [AdminStudentController::class, 'oldStudents'])
-            ->name('old-students.index');
+        Route::get('/students/old', [AdminStudentController::class, 'oldStudents'])
+            ->name('students.old');
     });
 
 /*

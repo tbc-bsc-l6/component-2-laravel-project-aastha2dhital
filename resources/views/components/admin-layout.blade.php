@@ -9,7 +9,7 @@
 
 <body class="bg-slate-100 antialiased">
 
-<div class="min-h-screen flex">
+<div class="flex min-h-screen overflow-x-hidden">
 
     {{-- SIDEBAR --}}
     <aside class="w-64 bg-gradient-to-b from-emerald-400 to-teal-300
@@ -47,8 +47,8 @@
                 🎓 Students
             </a>
 
-            <a href="{{ route('admin.old-students.index') }}"
-               class="{{ $link }} {{ request()->routeIs('admin.old-students.*') ? $active : $inactive }}">
+            <a href="{{ route('admin.students.old') }}"
+               class="{{ $link }} {{ request()->routeIs('admin.students.old*') ? $active : $inactive }}">
                 🕓 Old Students
             </a>
 
@@ -71,7 +71,7 @@
     </aside>
 
     {{-- MAIN --}}
-    <main class="flex-1 px-8 py-8">
+    <main class="flex-1 px-10 py-10 bg-slate-50">
         {{ $slot }}
     </main>
 

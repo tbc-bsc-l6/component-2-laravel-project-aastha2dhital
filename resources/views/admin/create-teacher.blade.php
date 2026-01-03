@@ -1,81 +1,104 @@
 <x-admin-layout>
-    <x-slot name="header">Create Teacher</x-slot>
-    <x-slot name="subheader">Add a new teacher account</x-slot>
 
-    <div class="max-w-xl bg-white rounded-xl shadow p-6">
+    {{-- ================= PAGE HEADER ================= --}}
+    <div class="mb-10 rounded-3xl
+                bg-gradient-to-r from-emerald-400 to-teal-300
+                px-10 py-8 text-white shadow-xl">
 
-        {{-- Validation Errors --}}
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <h1 class="text-3xl font-bold flex items-center gap-3">
+            ➕ Create Teacher
+        </h1>
 
-        <form method="POST" action="{{ route('admin.teachers.store') }}">
+        <p class="mt-2 text-white/90 text-sm max-w-2xl">
+            Add a new teacher to the system. Teachers can later be assigned
+            to academic modules and manage enrolled students.
+        </p>
+    </div>
+
+    {{-- ================= FORM CARD ================= --}}
+    <div class="max-w-2xl bg-white rounded-3xl shadow-xl
+                border border-slate-200 overflow-hidden">
+
+        <form method="POST"
+              action="{{ route('admin.teachers.store') }}"
+              class="px-8 py-8 space-y-6">
             @csrf
 
-            {{-- Name --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{-- FULL NAME --}}
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
                     Full Name
                 </label>
                 <input
                     type="text"
                     name="name"
                     value="{{ old('name') }}"
-                    class="w-full border rounded p-2"
                     required
-                >
+                    class="w-full rounded-xl border border-gray-300
+                           px-4 py-3 text-sm
+                           focus:outline-none
+                           focus:ring-2 focus:ring-emerald-400">
             </div>
 
-            {{-- Email --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{-- EMAIL --}}
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
                     Email Address
                 </label>
                 <input
                     type="email"
                     name="email"
                     value="{{ old('email') }}"
-                    class="w-full border rounded p-2"
                     required
-                >
+                    class="w-full rounded-xl border border-gray-300
+                           px-4 py-3 text-sm
+                           focus:outline-none
+                           focus:ring-2 focus:ring-emerald-400">
             </div>
 
-            {{-- Password --}}
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{-- PASSWORD --}}
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
                     Password
                 </label>
                 <input
                     type="password"
                     name="password"
-                    class="w-full border rounded p-2"
                     required
-                >
-                <p class="text-xs text-gray-500 mt-1">
+                    class="w-full rounded-xl border border-gray-300
+                           px-4 py-3 text-sm
+                           focus:outline-none
+                           focus:ring-2 focus:ring-emerald-400">
+
+                <p class="mt-1 text-xs text-gray-500">
                     Minimum 8 characters
                 </p>
             </div>
 
-            {{-- Actions --}}
-            <div class="flex justify-end gap-2">
-                <a
-                    href="{{ route('admin.teachers.index') }}"
-                    class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">
+            {{-- ACTIONS --}}
+            <div class="flex items-center justify-end gap-4 pt-6 border-t">
+
+                <a href="{{ route('admin.teachers.index') }}"
+                   class="rounded-xl px-5 py-2.5
+                          text-sm font-semibold
+                          text-gray-700 bg-gray-100
+                          hover:bg-gray-200 transition">
                     Cancel
                 </a>
 
                 <button
                     type="submit"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    class="rounded-xl px-6 py-2.5
+                           text-sm font-extrabold text-white
+                           bg-gradient-to-r from-emerald-400 to-teal-300
+                           shadow-lg
+                           hover:brightness-110
+                           transition">
                     Create Teacher
                 </button>
+
             </div>
         </form>
     </div>
+
 </x-admin-layout>

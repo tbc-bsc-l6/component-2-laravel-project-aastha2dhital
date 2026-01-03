@@ -8,10 +8,12 @@
 
 <body class="bg-slate-100 antialiased">
 
-<div class="flex min-h-screen">
+<!-- ROOT WRAPPER -->
+<div class="flex min-h-screen w-full overflow-x-hidden">
 
     {{-- ================= SIDEBAR ================= --}}
-    <aside class="w-64 bg-gradient-to-b from-slate-900 to-slate-800
+    <aside class="w-64 shrink-0
+                  bg-gradient-to-b from-slate-900 to-slate-800
                   text-slate-100 shadow-xl flex flex-col">
 
         <div class="px-6 py-6 text-xl font-bold border-b border-white/10">
@@ -59,7 +61,9 @@
 
             <form method="POST" action="{{ route('logout') }}" class="mt-4">
                 @csrf
-                <button class="w-full px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition">
+                <button
+                    class="w-full px-4 py-2 rounded-xl
+                           bg-white/10 hover:bg-white/20 transition">
                     🚪 Logout
                 </button>
             </form>
@@ -67,9 +71,9 @@
     </aside>
 
     {{-- ================= MAIN ================= --}}
-    <main class="flex-1 p-8">
+    <main class="flex-1 min-w-0 overflow-x-hidden p-8">
 
-        {{-- ===== GRADIENT HEADER (MATCHES TEACHER/STUDENT) ===== --}}
+        {{-- HEADER --}}
         <div class="mb-8 rounded-3xl px-10 py-8
                     bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500
                     text-white shadow-xl">
@@ -85,12 +89,13 @@
             @endif
         </div>
 
-        {{-- ===== PAGE CONTENT ===== --}}
-        @yield('content')
+        {{-- PAGE CONTENT --}}
+        <div class="w-full overflow-x-auto">
+            @yield('content')
+        </div>
 
     </main>
 
 </div>
-
 </body>
 </html>

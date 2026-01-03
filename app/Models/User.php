@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -24,49 +22,50 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * Each user belongs to a role (admin, teacher, student)
-     */
-    public function role(): BelongsTo
+    public function role()
     {
         return $this->belongsTo(UserRole::class, 'user_role_id');
     }
 
     /**
-     * Teacher ↔ Modules (module_teacher pivot)
+     * Modules student is/was enrolled in
      */
-    public function teachingModules(): BelongsToMany
+    public function modules()
     {
-        return $this->belongsToMany(
-            Module::class,
-            'module_teacher',
-            'user_id',
-            'module_id'
-        );
+        return $this->belongsToMany(Module::class)
+            ->withPivot(['pass_status', 'completed_at'])
+            ->withTimestamps();
     }
 
     /**
-     * Student ↔ Modules (module_user pivot)
+     * ACTIVE modules (current student)
      */
-    public function modules(): BelongsToMany
+    public function activeModules()
     {
-        return $this->belongsToMany(
-            Module::class,
-            'module_user',
-            'user_id',
-            'module_id'
-        )->withPivot([
-            'enrolled_at',
-            'completed_at',
-            'pass_status',
-        ])->withTimestamps();
+        return $this->modules()
+            ->wherePivotNull('completed_at');
+    }
+
+    /**
+     * COMPLETED modules (old student / history)
+     */
+    public function completedModules()
+    {
+        return $this->modules()
+            ->wherePivotNotNull('completed_at');
+    }
+
+    /**
+     * Modules taught by teacher
+     */
+    public function taughtModules()
+    {
+        return $this->hasMany(Module::class, 'teacher_id');
     }
 }

@@ -4,25 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\UserRole;
-use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
     /**
-     * List all students (student + old_student ONLY)
+     * CURRENT students
      */
     public function index()
     {
-        $students = User::with([
-                'role',
-                'modules' => function ($q) {
-                    $q->withPivot(['pass_status', 'completed_at']);
-                }
-            ])
-            ->whereHas('role', function ($q) {
-                $q->whereIn('role', ['student', 'old_student']); // ✅ FIX HERE
-            })
+        $students = User::whereHas('role', fn ($q) =>
+                $q->where('role', 'student')
+            )
+            ->whereHas('modules', fn ($q) =>
+                $q->whereNull('module_user.completed_at')
+            )
+            ->with('activeModules')
             ->orderBy('name')
             ->get();
 
@@ -30,57 +26,35 @@ class StudentController extends Controller
     }
 
     /**
-     * Update user role (LIMITED)
+     * OLD students
      */
-    public function updateRole(Request $request, User $user)
+    public function oldStudents()
     {
-        $request->validate([
-            'role' => 'required|in:student,teacher,old_student',
-        ]);
+        $students = User::whereHas('role', fn ($q) =>
+                $q->where('role', 'student')
+            )
+            ->whereDoesntHave('modules', fn ($q) =>
+                $q->whereNull('module_user.completed_at')
+            )
+            ->whereHas('modules') // must have history
+            ->with('completedModules')
+            ->orderBy('name')
+            ->get();
 
-        $role = UserRole::where('role', $request->role)->firstOrFail();
-
-        $user->role()->associate($role);
-        $user->save();
-
-        return back()->with('success', 'User role updated successfully.');
+        return view('admin.students.old', compact('students'));
     }
 
     /**
-     * Remove user 
+     * Remove student
      */
     public function destroy(User $user)
     {
         if ($user->role->role === 'admin') {
-            abort(403, 'Admin accounts cannot be removed.');
+            abort(403);
         }
 
         $user->delete();
 
-        return back()->with('success', 'User removed successfully.');
-    }
-
-    /**
-     * Automatically mark student as old_student
-     * if all modules are completed
-     */
-    private function updateOldStudentStatus(User $user): void
-    {
-        if ($user->role->role !== 'student') {
-            return;
-        }
-
-        $hasActiveModules = $user->modules()
-            ->whereNull('module_user.completed_at')
-            ->exists();
-
-        if (!$hasActiveModules && $user->modules()->exists()) {
-            $oldStudentRole = UserRole::where('role', 'old_student')->first();
-
-            if ($oldStudentRole) {
-                $user->role()->associate($oldStudentRole);
-                $user->save();
-            }
-        }
+        return back()->with('success', 'Student removed successfully.');
     }
 }

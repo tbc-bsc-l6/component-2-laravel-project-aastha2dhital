@@ -1,47 +1,52 @@
-@extends('layouts.admin')
+<x-admin-layout>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Old Students</h1>
+        <p class="text-sm text-gray-500">
+            Students who have completed all their enrolled modules
+        </p>
+    </div>
 
-@section('content')
+    <div class="overflow-hidden rounded-xl bg-white shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-emerald-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Student
+                    </th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                        Completed Modules
+                    </th>
+                </tr>
+            </thead>
 
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Old Students</h1>
-    <p class="text-sm text-gray-500">
-        Students who have completed their modules (PASS / FAIL history)
-    </p>
-</div>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($students as $student)
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-medium text-gray-800">
+                            {{ $student->name }}
+                        </td>
 
-<div class="overflow-x-auto rounded-xl bg-white shadow">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-100 text-gray-600">
-            <tr>
-                <th class="px-4 py-3 text-left">Name</th>
-                <th class="px-4 py-3 text-left">Email</th>
-                <th class="px-4 py-3 text-left">Completed Modules</th>
-            </tr>
-        </thead>
-
-        <tbody class="divide-y">
-        @foreach($students as $student)
-            <tr>
-                <td class="px-4 py-3 font-medium">{{ $student->name }}</td>
-                <td class="px-4 py-3">{{ $student->email }}</td>
-                <td class="px-4 py-3 space-y-1">
-                    @forelse($student->modules as $module)
-                        <div>
-                            {{ $module->module }} —
-                            @if($module->pivot->pass_status === 'pass')
-                                <span class="text-green-600 font-semibold">PASS</span>
-                            @else
-                                <span class="text-red-600 font-semibold">FAIL</span>
-                            @endif
-                        </div>
-                    @empty
-                        <span class="text-gray-400">No completed modules</span>
-                    @endforelse
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
-</div>
-
-@endsection
+                        <td class="px-6 py-4">
+                            <ul class="list-disc pl-5 text-sm text-gray-700">
+                                @foreach($student->completedModules as $module)
+                                    <li>
+                                        {{ $module->module }}
+                                        <span class="ml-1 text-xs text-gray-500">
+                                            ({{ $module->pivot->pass_status ?? 'N/A' }})
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2" class="px-6 py-6 text-center text-gray-500">
+                            No old students found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</x-admin-layout>
