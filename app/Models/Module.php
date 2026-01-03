@@ -13,7 +13,17 @@ class Module extends Model
     protected $fillable = [
         'module',
         'is_active',
+        'archived_at',
     ];
+
+    protected $casts = [
+        'is_active'   => 'boolean',
+        'archived_at' => 'datetime',
+    ];
+
+    /* ============================
+     | Relationships
+     |============================ */
 
     /**
      * Teachers assigned to this module
@@ -45,8 +55,28 @@ class Module extends Model
         ])->withTimestamps();
     }
 
+    /* ============================
+     | Helpers (IMPORTANT)
+     |============================ */
+
     /**
-     * Active student count (not completed)
+     * Is module archived?
+     */
+    public function isArchived(): bool
+    {
+        return ! is_null($this->archived_at);
+    }
+
+    /**
+     * Can students enrol?
+     */
+    public function isAvailable(): bool
+    {
+        return $this->is_active && ! $this->isArchived();
+    }
+
+    /**
+     * Count only active (not completed) students
      */
     public function activeStudentCount(): int
     {
@@ -56,7 +86,7 @@ class Module extends Model
     }
 
     /**
-     * Module capacity (max 10)
+     * Max capacity = 10
      */
     public function hasAvailableSeat(): bool
     {

@@ -76,47 +76,68 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
+        /* =========================
+           Dashboard
+        ========================= */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
-        /*
-        |-------------------------
-        | Modules
-        |-------------------------
-        */
-        Route::get('/modules', [AdminModuleController::class, 'index'])->name('modules.index');
-        Route::get('/modules/create', [AdminModuleController::class, 'create'])->name('modules.create');
-        Route::post('/modules', [AdminModuleController::class, 'store'])->name('modules.store');
-        Route::get('/modules/{module}', [AdminModuleController::class, 'show'])->name('modules.show');
-        Route::get('/modules/{module}/edit', [AdminModuleController::class, 'edit'])->name('modules.edit');
-        Route::put('/modules/{module}', [AdminModuleController::class, 'update'])->name('modules.update');
-        Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])->name('modules.toggle');
+        /* =========================
+           Modules
+        ========================= */
+        Route::get('/modules', [AdminModuleController::class, 'index'])
+            ->name('modules.index');
 
-        Route::get('/modules/{module}/students',
-            [AdminModuleController::class, 'students'])
+        Route::get('/modules/create', [AdminModuleController::class, 'create'])
+            ->name('modules.create');
+
+        Route::post('/modules', [AdminModuleController::class, 'store'])
+            ->name('modules.store');
+
+        Route::get('/modules/{module}', [AdminModuleController::class, 'show'])
+            ->name('modules.show');
+
+        Route::get('/modules/{module}/edit', [AdminModuleController::class, 'edit'])
+            ->name('modules.edit');
+
+        Route::put('/modules/{module}', [AdminModuleController::class, 'update'])
+            ->name('modules.update');
+
+        // Toggle active / inactive
+        Route::patch('/modules/{module}/toggle', [AdminModuleController::class, 'toggle'])
+            ->name('modules.toggle');
+
+        // ✅ ARCHIVE / RESTORE (NEW – REQUIRED)
+        Route::patch('/modules/{module}/archive', [AdminModuleController::class, 'archive'])
+            ->name('modules.archive');
+
+        // Students in module
+        Route::get('/modules/{module}/students', [AdminModuleController::class, 'students'])
             ->name('modules.students');
 
-        Route::delete('/modules/{module}/students/{user}',
-            [AdminModuleController::class, 'removeStudent'])
-            ->name('modules.students.remove');
+        Route::delete(
+            '/modules/{module}/students/{user}',
+            [AdminModuleController::class, 'removeStudent']
+        )->name('modules.students.remove');
 
-        /*
-        |-------------------------
-        | Teachers
-        |-------------------------
-        */
-        Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers.index');
-        Route::get('/teachers/create', [AdminController::class, 'createTeacher'])->name('teachers.create');
-        Route::post('/teachers', [AdminController::class, 'storeTeacher'])->name('teachers.store');
+        /* =========================
+           Teachers
+        ========================= */
+        Route::get('/teachers', [AdminController::class, 'teachers'])
+            ->name('teachers.index');
+
+        Route::get('/teachers/create', [AdminController::class, 'createTeacher'])
+            ->name('teachers.create');
+
+        Route::post('/teachers', [AdminController::class, 'storeTeacher'])
+            ->name('teachers.store');
+
         Route::delete('/teachers/{user}', [AdminController::class, 'destroyTeacher'])
             ->name('teachers.destroy');
 
-        /*
-        |-------------------------
-        | Students (NEW – CORRECT)
-        |-------------------------
-        */
+        /* =========================
+           Students
+        ========================= */
         Route::get('/students', [AdminStudentController::class, 'index'])
             ->name('students.index');
 
@@ -125,6 +146,12 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::delete('/students/{user}', [AdminStudentController::class, 'destroy'])
             ->name('students.destroy');
+
+        /* =========================
+           Old Students
+        ========================= */
+        Route::get('/old-students', [AdminStudentController::class, 'oldStudents'])
+            ->name('old-students.index');
     });
 
 /*
@@ -143,7 +170,6 @@ Route::middleware(['auth', 'role:student'])
         Route::get('/modules', [StudentModuleController::class, 'index'])
             ->name('modules.index');
 
-        // Enrol
         Route::post('/modules/{module}/enrol', [StudentModuleController::class, 'enrol'])
             ->name('modules.enrol');
 
@@ -170,13 +196,15 @@ Route::middleware(['auth', 'role:teacher'])
         Route::get('/modules/{module}', [TeacherModuleController::class, 'show'])
             ->name('modules.show');
 
-        Route::post('/modules/{module}/students/{user}/grade',
-            [TeacherModuleController::class, 'grade'])
-            ->name('modules.grade');
+        Route::post(
+            '/modules/{module}/students/{user}/grade',
+            [TeacherModuleController::class, 'grade']
+        )->name('modules.grade');
 
-        Route::post('/modules/{module}/students/{user}/reset',
-            [TeacherModuleController::class, 'resetGrade'])
-            ->name('modules.reset');
+        Route::post(
+            '/modules/{module}/students/{user}/reset',
+            [TeacherModuleController::class, 'resetGrade']
+        )->name('modules.reset');
     });
 
 require __DIR__ . '/auth.php';

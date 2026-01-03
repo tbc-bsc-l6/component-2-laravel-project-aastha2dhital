@@ -10,19 +10,26 @@ class ModuleController extends Controller
     /**
      * Student module page:
      * - Active enrolled modules
-     * - Available modules
+     * - Available (active + not archived) modules
      */
     public function index()
     {
         $student = auth()->user();
 
-        // Active enrolled modules
+        /* ==========================
+           ACTIVE ENROLLED MODULES
+        =========================== */
         $enrolledModules = $student->modules()
             ->wherePivotNull('completed_at')
+            ->whereNull('modules.archived_at')
             ->get();
 
-        // Available modules
-        $availableModules = Module::where('is_active', 1)
+        /* ==========================
+           AVAILABLE MODULES
+        =========================== */
+        $availableModules = Module::query()
+            ->where('active', true)               // must be active
+            ->whereNull('archived_at')            // must NOT be archived
             ->whereDoesntHave('students', function ($q) use ($student) {
                 $q->where('user_id', $student->id)
                   ->whereNull('completed_at');
@@ -44,7 +51,16 @@ class ModuleController extends Controller
     {
         $student = auth()->user();
 
-        // RULE 1: Max 4 active modules
+        /* ==========================
+           RULE 0: Module must be active & not archived
+        =========================== */
+        if (! $module->active || $module->isArchived()) {
+            return back()->with('error', 'This module is not available for enrolment.');
+        }
+
+        /* ==========================
+           RULE 1: Max 4 active modules
+        =========================== */
         $activeModules = $student->modules()
             ->wherePivotNull('completed_at')
             ->count();
@@ -53,17 +69,23 @@ class ModuleController extends Controller
             return back()->with('error', 'You have reached the maximum of 4 active modules.');
         }
 
-        // RULE 2: Module capacity (max 10 students)
+        /* ==========================
+           RULE 2: Module capacity
+        =========================== */
         if (! $module->hasAvailableSeat()) {
             return back()->with('error', 'This module is already full.');
         }
 
-        // RULE 3: Prevent duplicate enrolment
+        /* ==========================
+           RULE 3: Prevent duplicate enrolment
+        =========================== */
         if ($student->modules()->where('module_id', $module->id)->exists()) {
             return back()->with('error', 'You are already enrolled in this module.');
         }
 
-        // Enrol student
+        /* ==========================
+           ENROL STUDENT
+        =========================== */
         $student->modules()->attach($module->id, [
             'enrolled_at' => now(),
         ]);

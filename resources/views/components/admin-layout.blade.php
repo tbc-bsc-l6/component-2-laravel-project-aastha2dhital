@@ -2,109 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $title ?? 'Admin Dashboard' }}</title>
+    <title>{{ $title ?? 'Admin Panel' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-slate-100 antialiased">
 
-<div class="flex min-h-screen">
+<div class="min-h-screen flex">
 
     {{-- SIDEBAR --}}
-    <aside class="w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col">
+    <aside class="w-64 bg-gradient-to-b from-emerald-400 to-teal-300
+                  text-white flex flex-col shadow-xl">
 
-        {{-- LOGO --}}
-        <div class="px-6 py-4 text-xl font-bold border-b border-gray-800 tracking-wide">
-            Admin Panel
+        <div class="px-6 py-6 text-xl font-bold border-b border-white/30">
+            🛠 Admin Panel
         </div>
 
-        {{-- NAVIGATION --}}
-        <nav class="flex-1 px-2 py-6 space-y-1 text-sm">
+        <nav class="flex-1 px-4 py-6 space-y-2 text-sm font-semibold">
 
-            {{-- Dashboard --}}
+            @php
+                $link = 'block px-4 py-3 rounded-xl transition';
+                $active = 'bg-white/25';
+                $inactive = 'hover:bg-white/20';
+            @endphp
+
             <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center px-6 py-3 font-medium
-               {{ request()->routeIs('admin.dashboard')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                Dashboard
+               class="{{ $link }} {{ request()->routeIs('admin.dashboard') ? $active : $inactive }}">
+                📊 Dashboard
             </a>
 
-            {{-- Modules --}}
             <a href="{{ route('admin.modules.index') }}"
-               class="flex items-center px-6 py-3 font-medium
-               {{ request()->routeIs('admin.modules.*')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                Modules
+               class="{{ $link }} {{ request()->routeIs('admin.modules.*') ? $active : $inactive }}">
+                📚 Modules
             </a>
 
-            {{-- Teachers --}}
             <a href="{{ route('admin.teachers.index') }}"
-               class="flex items-center px-6 py-3 font-medium
-               {{ request()->routeIs('admin.teachers.*')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                Teachers
+               class="{{ $link }} {{ request()->routeIs('admin.teachers.*') ? $active : $inactive }}">
+                👩‍🏫 Teachers
             </a>
 
-            {{-- Students --}}
             <a href="{{ route('admin.students.index') }}"
-               class="flex items-center px-6 py-3 font-medium
-               {{ request()->routeIs('admin.students.*')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                Students
+               class="{{ $link }} {{ request()->routeIs('admin.students.*') ? $active : $inactive }}">
+                🎓 Students
             </a>
 
-            {{-- Old Students --}}
             <a href="{{ route('admin.old-students.index') }}"
-               class="flex items-center px-6 py-3 font-medium
-               {{ request()->routeIs('admin.old-students.*')
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                Old Students
+               class="{{ $link }} {{ request()->routeIs('admin.old-students.*') ? $active : $inactive }}">
+                🕓 Old Students
             </a>
 
         </nav>
 
-        {{-- USER INFO --}}
-        <div class="px-6 py-4 border-t border-gray-800 text-sm">
-            <p class="text-gray-400">Logged in as</p>
-            <p class="font-medium text-white">
-                {{ auth()->user()->name }}
-            </p>
-        </div>
-
-    </aside>
-
-    {{-- MAIN CONTENT --}}
-    <main class="flex-1 p-8">
-
-        {{-- TOP HEADER --}}
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">
-                    {{ $header ?? 'Admin Dashboard' }}
-                </h1>
-                <p class="text-gray-500">
-                    {{ $subheader ?? 'Manage system data and users' }}
-                </p>
+        <div class="p-4 border-t border-white/30 text-sm">
+            <div class="text-white/80">
+                Logged in as<br>
+                <span class="font-bold">{{ auth()->user()->name }}</span>
             </div>
 
-            {{-- LOGOUT --}}
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" class="mt-4">
                 @csrf
-                <button class="text-sm text-red-600 hover:underline">
-                    Logout
+                <button class="w-full py-2 rounded-xl bg-white/25 hover:bg-white/30 transition">
+                    🚪 Logout
                 </button>
             </form>
         </div>
 
-        {{-- PAGE CONTENT --}}
-        {{ $slot }}
+    </aside>
 
+    {{-- MAIN --}}
+    <main class="flex-1 px-8 py-8">
+        {{ $slot }}
     </main>
 
 </div>
