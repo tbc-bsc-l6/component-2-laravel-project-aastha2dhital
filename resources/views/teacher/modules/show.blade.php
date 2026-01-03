@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{-- ================= HEADER ================= --}}
+{{-- ================= MODULE HEADER ================= --}}
 <div class="mb-6 rounded-2xl px-8 py-6
             bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400
             text-white shadow-lg">
@@ -21,7 +21,7 @@
     <input
         type="text"
         name="search"
-        value="{{ $search ?? '' }}"
+        value="{{ request('search') }}"
         placeholder="Search student..."
         class="flex-1 rounded-lg border border-slate-300
                px-4 py-2 text-sm
@@ -125,9 +125,9 @@
     </h2>
 
     @php
-        $completed = $module->users()
+        $completed = $module->students()
             ->wherePivotNotNull('completed_at')
-            ->withPivot(['pass_status', 'completed_at'])
+            ->withPivot(['pass_status', 'created_at', 'completed_at'])
             ->get();
     @endphp
 
@@ -141,6 +141,7 @@
                 <thead class="border-b text-slate-600">
                     <tr class="text-left">
                         <th class="py-3">Student</th>
+                        <th>Enrolled On</th>
                         <th>Result</th>
                         <th>Completed On</th>
                     </tr>
@@ -153,15 +154,22 @@
                             {{ $student->name }}
                         </td>
 
+                        {{-- Enrolled Date --}}
+                        <td class="text-slate-600">
+                            {{ \Carbon\Carbon::parse($student->pivot->created_at)->format('d M Y') }}
+                        </td>
+
+                        {{-- Result --}}
                         <td>
                             <span class="rounded-full px-3 py-1 text-xs font-semibold
-                                {{ $student->pivot->pass_status === 'pass'
+                                {{ strtolower($student->pivot->pass_status) === 'pass'
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-red-100 text-red-700' }}">
                                 {{ strtoupper($student->pivot->pass_status) }}
                             </span>
                         </td>
 
+                        {{-- Completed Date --}}
                         <td class="text-slate-600">
                             {{ \Carbon\Carbon::parse($student->pivot->completed_at)->format('d M Y') }}
                         </td>

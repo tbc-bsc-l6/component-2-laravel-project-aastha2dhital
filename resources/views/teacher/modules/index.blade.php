@@ -24,7 +24,7 @@
             <p class="mt-1 text-sm text-slate-600">
                 Active students:
                 <span class="font-semibold">
-                    {{ $module->users()
+                    {{ $module->students()
                         ->wherePivotNull('completed_at')
                         ->count() }}
                 </span>

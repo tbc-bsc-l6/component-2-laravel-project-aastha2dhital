@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-use App\Models\UserRole;
-use App\Models\Module;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -33,23 +32,41 @@ class User extends Authenticatable
         ];
     }
 
-    // Each user belongs to a role (admin, teacher, student, old_student)
-    public function role()
+    /**
+     * Each user belongs to a role (admin, teacher, student)
+     */
+    public function role(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\UserRole::class, 'user_role_id');
+        return $this->belongsTo(UserRole::class, 'user_role_id');
     }
 
-    // A teacher teaches many modules
-    public function teachingModules()
+    /**
+     * Teacher ↔ Modules (module_teacher pivot)
+     */
+    public function teachingModules(): BelongsToMany
     {
-        return $this->belongsToMany(Module::class, 'module_teacher');
+        return $this->belongsToMany(
+            Module::class,
+            'module_teacher',
+            'user_id',
+            'module_id'
+        );
     }
 
-    // A student is enrolled in many modules
-    public function modules()
+    /**
+     * Student ↔ Modules (module_user pivot)
+     */
+    public function modules(): BelongsToMany
     {
-        return $this->belongsToMany(Module::class)
-                    ->withPivot('enrolled_at', 'completed_at', 'pass_status')
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            Module::class,
+            'module_user',
+            'user_id',
+            'module_id'
+        )->withPivot([
+            'enrolled_at',
+            'completed_at',
+            'pass_status',
+        ])->withTimestamps();
     }
 }

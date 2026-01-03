@@ -9,72 +9,65 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | List modules assigned to teacher
-    |--------------------------------------------------------------------------
-    */
+    /**
+     * Show teacher modules
+     */
     public function index()
     {
-        $teacher = auth()->user();
-
-        $modules = $teacher->teachingModules()->get();
+        $modules = auth()->user()
+            ->teachingModules()
+            ->get();
 
         return view('teacher.modules.index', compact('modules'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Show students in a module
-    |--------------------------------------------------------------------------
-    */
+    /**
+     * Show students of a module
+     */
     public function show(Module $module)
     {
         // Ensure teacher is assigned to this module
         abort_unless(
-            $module->teachers()->where('users.id', auth()->id())->exists(),
+            $module->teachers()
+                ->where('users.id', auth()->id())
+                ->exists(),
             403
         );
 
-        $students = $module->users()->get();
+        // ACTIVE students only
+        $students = $module->students()
+            ->wherePivotNull('completed_at')
+            ->get();
 
         return view('teacher.modules.show', compact('module', 'students'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Grade student (PASS / FAIL)
-    |--------------------------------------------------------------------------
-    */
+    /**
+     * Grade student (PASS / FAIL)
+     */
     public function grade(Request $request, Module $module, User $user)
     {
-        abort_unless(
-            $module->teachers()->where('users.id', auth()->id())->exists(),
-            403
-        );
-
         $request->validate([
-            'pass_status' => ['required', 'in:PASS,FAIL'],
+            'pass_status' => ['required', 'in:pass,fail'],
         ]);
 
-        $module->users()->updateExistingPivot($user->id, [
-            'pass_status'  => $request->pass_status,
+        // SQLite CHECK constraint requires uppercase
+        $status = strtoupper($request->pass_status);
+
+        $module->students()->updateExistingPivot($user->id, [
+            'pass_status'  => $status,
             'completed_at' => now(),
         ]);
 
         return back()->with('success', 'Student graded successfully.');
     }
 
-    //  Reset grade 
-    
-    public function resetGrade(Module $module, User $user)
+    /**
+     * Reset grade (optional feature)
+     */
+    public function reset(Module $module, User $user)
     {
-        abort_unless(
-            $module->teachers()->where('users.id', auth()->id())->exists(),
-            403
-        );
-
-        $module->users()->updateExistingPivot($user->id, [
+        $module->students()->updateExistingPivot($user->id, [
             'pass_status'  => null,
             'completed_at' => null,
         ]);

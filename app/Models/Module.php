@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\User;
 
 class Module extends Model
 {
@@ -25,8 +24,8 @@ class Module extends Model
             User::class,
             'module_teacher',
             'module_id',
-            'teacher_id'
-        )->withTimestamps();
+            'user_id'
+        );
     }
 
     /**
@@ -36,16 +35,18 @@ class Module extends Model
     {
         return $this->belongsToMany(
             User::class,
-            'module_user',   // ✅ CONFIRMED pivot table
+            'module_user',
             'module_id',
             'user_id'
-        )
-        ->withPivot(['completed_at', 'grade'])
-        ->withTimestamps();
+        )->withPivot([
+            'enrolled_at',
+            'completed_at',
+            'pass_status',
+        ])->withTimestamps();
     }
 
     /**
-     * Count only active (not completed) students
+     * Active student count (not completed)
      */
     public function activeStudentCount(): int
     {
@@ -55,18 +56,10 @@ class Module extends Model
     }
 
     /**
-     * Capacity rule (max 10 students)
+     * Module capacity (max 10)
      */
     public function hasAvailableSeat(): bool
     {
         return $this->activeStudentCount() < 10;
-    }
-
-    /**
-     * Can this module accept new enrolments?
-     */
-    public function canAcceptEnrollment(): bool
-    {
-        return $this->is_active && $this->hasAvailableSeat();
     }
 }
