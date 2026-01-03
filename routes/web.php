@@ -2,12 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+
+// Admin
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
+
+// Student
 use App\Http\Controllers\Student\ModuleController as StudentModuleController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\Student\CompletedModuleController;
+
+// Teacher
 use App\Http\Controllers\Teacher\ModuleController as TeacherModuleController;
 
 /*
@@ -36,7 +43,6 @@ Route::middleware('auth')->get('/dashboard', function () {
     }
 
     if ($user->role->role === 'student') {
-
         $hasActiveModules = $user->modules()
             ->whereNull('module_user.completed_at')
             ->exists();
@@ -70,10 +76,15 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
-        // Modules
+        /*
+        |-------------------------
+        | Modules
+        |-------------------------
+        */
         Route::get('/modules', [AdminModuleController::class, 'index'])->name('modules.index');
         Route::get('/modules/create', [AdminModuleController::class, 'create'])->name('modules.create');
         Route::post('/modules', [AdminModuleController::class, 'store'])->name('modules.store');
@@ -90,19 +101,30 @@ Route::middleware(['auth', 'role:admin'])
             [AdminModuleController::class, 'removeStudent'])
             ->name('modules.students.remove');
 
-        // Teachers
+        /*
+        |-------------------------
+        | Teachers
+        |-------------------------
+        */
         Route::get('/teachers', [AdminController::class, 'teachers'])->name('teachers.index');
         Route::get('/teachers/create', [AdminController::class, 'createTeacher'])->name('teachers.create');
         Route::post('/teachers', [AdminController::class, 'storeTeacher'])->name('teachers.store');
         Route::delete('/teachers/{user}', [AdminController::class, 'destroyTeacher'])
             ->name('teachers.destroy');
 
-        // Students
-        Route::get('/students', [AdminController::class, 'students'])
+        /*
+        |-------------------------
+        | Students (NEW – CORRECT)
+        |-------------------------
+        */
+        Route::get('/students', [AdminStudentController::class, 'index'])
             ->name('students.index');
 
-        Route::get('/old-students', [AdminController::class, 'oldStudents'])
-            ->name('old-students.index');
+        Route::patch('/students/{user}/role', [AdminStudentController::class, 'updateRole'])
+            ->name('students.updateRole');
+
+        Route::delete('/students/{user}', [AdminStudentController::class, 'destroy'])
+            ->name('students.destroy');
     });
 
 /*
@@ -121,7 +143,7 @@ Route::middleware(['auth', 'role:student'])
         Route::get('/modules', [StudentModuleController::class, 'index'])
             ->name('modules.index');
 
-        // ✅ FIXED: enrol (British spelling)
+        // Enrol
         Route::post('/modules/{module}/enrol', [StudentModuleController::class, 'enrol'])
             ->name('modules.enrol');
 
