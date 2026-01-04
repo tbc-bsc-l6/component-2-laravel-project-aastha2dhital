@@ -9,16 +9,26 @@ class StudentController extends Controller
 {
     /**
      * CURRENT students
+     * (students who have at least one active module)
      */
     public function index()
     {
-        $students = User::whereHas('role', fn ($q) =>
-                $q->where('role', 'student')
-            )
-            ->whereHas('modules', fn ($q) =>
-                $q->whereNull('module_user.completed_at')
-            )
-            ->with('activeModules')
+        $students = User::with([
+                'role',
+                'modules' => function ($q) {
+                    $q->withPivot([
+                        'enrolled_at',
+                        'completed_at',
+                        'pass_status',
+                    ]);
+                },
+            ])
+            ->whereHas('role', function ($q) {
+                $q->where('role', 'student');
+            })
+            ->whereHas('modules', function ($q) {
+                $q->whereNull('module_user.completed_at');
+            })
             ->orderBy('name')
             ->get();
 
@@ -27,17 +37,27 @@ class StudentController extends Controller
 
     /**
      * OLD students
+     * (students who have NO active modules, but DO have history)
      */
     public function oldStudents()
     {
-        $students = User::whereHas('role', fn ($q) =>
-                $q->where('role', 'student')
-            )
-            ->whereDoesntHave('modules', fn ($q) =>
-                $q->whereNull('module_user.completed_at')
-            )
-            ->whereHas('modules') // must have history
-            ->with('completedModules')
+        $students = User::with([
+                'role',
+                'modules' => function ($q) {
+                    $q->withPivot([
+                        'enrolled_at',
+                        'completed_at',
+                        'pass_status',
+                    ]);
+                },
+            ])
+            ->whereHas('role', function ($q) {
+                $q->where('role', 'student');
+            })
+            ->whereDoesntHave('modules', function ($q) {
+                $q->whereNull('module_user.completed_at');
+            })
+            ->whereHas('modules') // must have at least one completed module
             ->orderBy('name')
             ->get();
 
