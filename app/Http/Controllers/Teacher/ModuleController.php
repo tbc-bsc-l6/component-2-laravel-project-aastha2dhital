@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class ModuleController extends Controller
 {
     /**
-     * Show teacher modules
+     * List modules assigned to teacher
      */
     public function index()
     {
@@ -22,11 +22,11 @@ class ModuleController extends Controller
     }
 
     /**
-     * Show students of a module
+     * Show students (ACTIVE + COMPLETED) of a module
      */
-    public function show(Module $module)
+    public function students(Module $module)
     {
-        // Ensure teacher is assigned to this module
+        // Security: teacher must own module
         abort_unless(
             $module->teachers()
                 ->where('users.id', auth()->id())
@@ -34,16 +34,24 @@ class ModuleController extends Controller
             403
         );
 
-        // ACTIVE students only
-        $students = $module->students()
+        // Active students (not graded yet)
+        $activeStudents = $module->students()
             ->wherePivotNull('completed_at')
             ->get();
 
-        return view('teacher.modules.show', compact('module', 'students'));
+        // Completed students (graded)
+        $completedStudents = $module->students()
+            ->wherePivotNotNull('completed_at')
+            ->get();
+
+        return view(
+            'teacher.modules.students',
+            compact('module', 'activeStudents', 'completedStudents')
+        );
     }
 
     /**
-     * Grade student (PASS / FAIL)
+     * Grade student
      */
     public function grade(Request $request, Module $module, User $user)
     {
@@ -51,11 +59,18 @@ class ModuleController extends Controller
             'pass_status' => ['required', 'in:pass,fail'],
         ]);
 
-        // SQLite CHECK constraint requires uppercase
-        $status = strtoupper($request->pass_status);
+        // Prevent re-grading
+        abort_if(
+            $module->students()
+                ->where('users.id', $user->id)
+                ->wherePivotNotNull('completed_at')
+                ->exists(),
+            403,
+            'Student already graded.'
+        );
 
         $module->students()->updateExistingPivot($user->id, [
-            'pass_status'  => $status,
+            'pass_status'  => strtoupper($request->pass_status),
             'completed_at' => now(),
         ]);
 
@@ -65,7 +80,7 @@ class ModuleController extends Controller
     /**
      * Reset grade (optional feature)
      */
-    public function reset(Module $module, User $user)
+    public function resetGrade(Module $module, User $user)
     {
         $module->students()->updateExistingPivot($user->id, [
             'pass_status'  => null,

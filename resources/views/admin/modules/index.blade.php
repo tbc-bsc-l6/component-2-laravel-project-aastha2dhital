@@ -3,9 +3,10 @@
     {{-- ================= PAGE HEADER ================= --}}
     <div class="mb-10 flex flex-col gap-6">
 
-        {{-- Gradient Title --}}
+        {{-- Gradient Title (MATCHES OTHER PAGES) --}}
         <div
-            class="rounded-3xl bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500
+            class="rounded-3xl
+                   bg-gradient-to-r from-emerald-400 to-teal-300
                    px-10 py-8 text-white shadow-xl">
 
             <h1 class="text-3xl font-bold flex items-center gap-3">
@@ -30,17 +31,17 @@
                 </p>
             </div>
 
-            {{-- ADD MODULE BUTTON (FINAL & CLEAN) --}}
+            {{-- ADD MODULE BUTTON (MATCHES HEADER GRADIENT) --}}
             <a href="{{ route('admin.modules.create') }}"
                class="
                     inline-flex items-center gap-2
                     px-7 py-3
                     rounded-xl
-                    bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500
+                    bg-gradient-to-r from-emerald-400 to-teal-300
                     text-white
                     text-sm font-extrabold
                     shadow-lg
-                    ring-2 ring-emerald-600/40
+                    ring-2 ring-emerald-500/30
                     hover:brightness-110
                     hover:shadow-xl
                     transition
@@ -68,10 +69,12 @@
                 @forelse($modules as $module)
                     <tr class="hover:bg-slate-50 transition">
 
+                        {{-- MODULE NAME --}}
                         <td class="px-8 py-4 font-medium text-gray-800">
                             {{ $module->module }}
                         </td>
 
+                        {{-- STATUS --}}
                         <td class="px-6 py-4">
                             @if($module->isArchived())
                                 <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
@@ -88,6 +91,7 @@
                             @endif
                         </td>
 
+                        {{-- ACTIONS --}}
                         <td class="px-8 py-4 text-right">
                             <div class="inline-flex items-center gap-4 font-semibold">
 

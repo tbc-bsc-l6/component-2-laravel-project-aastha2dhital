@@ -4,106 +4,71 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-    /**
-     * Student module page:
-     * - Active enrolled modules
-     * - Available (active + not archived) modules
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $student = auth()->user();
+        $user = auth()->user();
+        $search = $request->query('search');
 
-        /* ==========================
-           ACTIVE ENROLLED MODULES
-        =========================== */
-        $enrolledModules = $student->modules()
-            ->wherePivotNull('completed_at')
-            ->whereNull('modules.archived_at')
+        // Active (not completed)
+        $activeModules = $user->activeModules()->get();
+
+        // Completed (history)
+        $completedModules = $user->completedModules()->get();
+
+        // OLD STUDENT: only show completed
+        if ($activeModules->count() === 0 && $completedModules->count() > 0) {
+            return view('student.modules.index', [
+                'activeModules' => collect(),
+                'availableModules' => collect(),
+                'completedModules' => $completedModules,
+                'search' => $search,
+            ]);
+        }
+
+        // Available modules (exclude already enrolled)
+        $availableModules = Module::whereNotIn(
+                'id',
+                $user->modules()->pluck('modules.id')
+            )
+            ->when($search, function ($q) use ($search) {
+                $q->where('module', 'like', "%{$search}%");
+            })
             ->get();
 
-        /* ==========================
-           AVAILABLE MODULES
-        =========================== */
-        $availableModules = Module::query()
-            ->where('active', true)               // must be active
-            ->whereNull('archived_at')            // must NOT be archived
-            ->whereDoesntHave('students', function ($q) use ($student) {
-                $q->where('user_id', $student->id)
-                  ->whereNull('completed_at');
-            })
-            ->withCount('students')
-            ->get()
-            ->filter(fn ($module) => $module->students_count < 10);
-
         return view('student.modules.index', compact(
-            'enrolledModules',
-            'availableModules'
+            'activeModules',
+            'availableModules',
+            'completedModules',
+            'search'
         ));
     }
 
-    /**
-     * Enrol student in a module
-     */
     public function enrol(Module $module)
     {
-        $student = auth()->user();
+        $user = auth()->user();
 
-        /* ==========================
-           RULE 0: Module must be active & not archived
-        =========================== */
-        if (! $module->active || $module->isArchived()) {
-            return back()->with('error', 'This module is not available for enrolment.');
+        // 🔒 MAX 4 MODULES RULE
+        if ($user->activeModules()->count() >= 4) {
+            return redirect()
+                ->back()
+                ->with('error', 'You can only enrol in up to 4 modules.');
         }
 
-        /* ==========================
-           RULE 1: Max 4 active modules
-        =========================== */
-        $activeModules = $student->modules()
-            ->wherePivotNull('completed_at')
-            ->count();
-
-        if ($activeModules >= 4) {
-            return back()->with('error', 'You have reached the maximum of 4 active modules.');
+        // Prevent double enrol
+        if ($user->modules()->where('module_id', $module->id)->exists()) {
+            return redirect()->back();
         }
 
-        /* ==========================
-           RULE 2: Module capacity
-        =========================== */
-        if (! $module->hasAvailableSeat()) {
-            return back()->with('error', 'This module is already full.');
-        }
-
-        /* ==========================
-           RULE 3: Prevent duplicate enrolment
-        =========================== */
-        if ($student->modules()->where('module_id', $module->id)->exists()) {
-            return back()->with('error', 'You are already enrolled in this module.');
-        }
-
-        /* ==========================
-           ENROL STUDENT
-        =========================== */
-        $student->modules()->attach($module->id, [
+        $user->modules()->attach($module->id, [
             'enrolled_at' => now(),
         ]);
 
-        return back()->with('success', 'Successfully enrolled in module.');
-    }
-
-    /**
-     * Completed modules (Old Student view)
-     */
-    public function history()
-    {
-        $student = auth()->user();
-
-        $completedModules = $student->modules()
-            ->wherePivotNotNull('completed_at')
-            ->get();
-
-        return view('student.modules.history', compact('completedModules'));
+        return redirect()
+            ->back()
+            ->with('success', 'Module enrolled successfully.');
     }
 }

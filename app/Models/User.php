@@ -61,12 +61,34 @@ class User extends Authenticatable
     }
 
     /**
-     * COMPLETED modules (old student / history)
+     * COMPLETED modules (history / old student)
      */
     public function completedModules(): BelongsToMany
     {
         return $this->modules()
             ->wherePivotNotNull('completed_at');
+    }
+
+    /* =================================================
+     | ALIASES (USED BY CONTROLLERS — DO NOT REMOVE)
+     |================================================= */
+
+    /**
+     * Alias for activeModules()
+     * Used by StudentModuleController
+     */
+    public function activeEnrollments(): BelongsToMany
+    {
+        return $this->activeModules();
+    }
+
+    /**
+     * Alias for completedModules()
+     * Used by StudentModuleController
+     */
+    public function completedEnrollments(): BelongsToMany
+    {
+        return $this->completedModules();
     }
 
     /* ==========================
@@ -76,13 +98,13 @@ class User extends Authenticatable
     /**
      * Modules taught by the teacher
      */
-    public function taughtModules(): BelongsToMany
+    public function teachingModules(): BelongsToMany
     {
         return $this->belongsToMany(
             Module::class,
             'module_teacher',
             'user_id',
             'module_id'
-        );
+        )->withTimestamps();
     }
 }

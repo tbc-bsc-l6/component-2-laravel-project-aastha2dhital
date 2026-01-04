@@ -47,8 +47,8 @@
                 🎓 Students
             </a>
 
-            <a href="{{ route('admin.old-students.index') }}"
-               class="{{ $base }} {{ request()->routeIs('admin.old-students.*') ? $active : $inactive }}">
+            <a href="{{ route('admin.students.old') }}"
+               class="{{ $base }} {{ request()->routeIs('admin.students.old') ? $active : $inactive }}">
                 🕓 Old Students
             </a>
         </nav>

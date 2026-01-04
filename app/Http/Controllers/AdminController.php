@@ -65,7 +65,7 @@ class AdminController extends Controller
         $teachers = User::whereHas('role', function ($q) {
             $q->where('role', 'teacher');
         })
-         ->with('taughtModules') 
+         ->with('teachingModules') 
          ->orderBy('name')
          ->get();
 
