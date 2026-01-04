@@ -48,27 +48,41 @@ class ModuleController extends Controller
     }
 
     public function enrol(Module $module)
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        // 🔒 MAX 4 MODULES RULE
-        if ($user->activeModules()->count() >= 4) {
-            return redirect()
-                ->back()
-                ->with('error', 'You can only enrol in up to 4 modules.');
-        }
-
-        // Prevent double enrol
-        if ($user->modules()->where('module_id', $module->id)->exists()) {
-            return redirect()->back();
-        }
-
-        $user->modules()->attach($module->id, [
-            'enrolled_at' => now(),
-        ]);
-
-        return redirect()
-            ->back()
-            ->with('success', 'Module enrolled successfully.');
+    // Max 4 active modules per student
+    if ($user->activeModules()->count() >= 4) {
+        return back()->with(
+            'error',
+            'A student can enrol in a maximum of 4 modules.'
+        );
     }
+
+    // Max 10 active students per module (USING MODEL HELPER ✅)
+    if (! $module->hasAvailableSeat()) {
+        return back()->with(
+            'error',
+            'This module already has the maximum of 10 students.'
+        );
+    }
+
+    // Prevent duplicate enrolment
+    if ($user->modules()->where('module_id', $module->id)->exists()) {
+        return back()->with(
+            'error',
+            'You are already enrolled in this module.'
+        );
+    }
+
+    // Enrol student
+    $user->modules()->attach($module->id, [
+        'enrolled_at' => now(),
+    ]);
+
+    return back()->with(
+        'success',
+        'Successfully enrolled in the module.'
+    );
+}
 }

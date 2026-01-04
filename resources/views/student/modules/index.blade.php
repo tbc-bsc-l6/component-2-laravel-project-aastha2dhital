@@ -79,20 +79,32 @@
                         {{ $module->module }}
                     </h3>
 
-                    <form
-                        method="POST"
-                        action="{{ route('student.modules.enrol', $module) }}"
-                        class="mt-4 flex justify-end">
-                        @csrf
-                        <button
-                            class="inline-flex items-center
-                                   rounded-full bg-emerald-500
-                                   px-4 py-1.5 text-xs
-                                   font-semibold text-white
-                                   hover:bg-emerald-600">
-                            Enrol
-                        </button>
-                    </form>
+                    <div class="mt-4 flex justify-end">
+                        @if(method_exists($module, 'hasAvailableSeat') && ! $module->hasAvailableSeat())
+                            {{-- MODULE FULL --}}
+                            <span
+                                class="rounded-full bg-gray-200 px-4 py-1.5
+                                       text-xs font-semibold text-gray-600">
+                                Module Full
+                            </span>
+                        @else
+                            {{-- ENROL BUTTON --}}
+                            <form
+                                method="POST"
+                                action="{{ route('student.modules.enrol', $module) }}">
+                                @csrf
+                                <button
+                                    class="inline-flex items-center
+                                           rounded-full bg-emerald-500
+                                           px-4 py-1.5 text-xs
+                                           font-semibold text-white
+                                           hover:bg-emerald-600">
+                                    Enrol
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+
                 </div>
             @endforeach
         </div>
