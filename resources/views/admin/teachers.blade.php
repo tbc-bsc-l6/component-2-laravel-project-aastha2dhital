@@ -44,7 +44,7 @@
             </thead>
 
             <tbody class="divide-y">
-                @foreach($teachers as $teacher)
+                @forelse($teachers as $teacher)
                     <tr class="hover:bg-slate-50">
                         <td class="px-6 py-4 font-medium">
                             {{ $teacher->name }}
@@ -54,15 +54,15 @@
                             {{ $teacher->email }}
                         </td>
 
-                        {{-- MODULES --}}
+                        {{-- ASSIGNED MODULES --}}
                         <td class="px-6 py-4">
-                            @if($teacher->modules->isEmpty())
+                            @if($teacher->taughtModules->isEmpty())
                                 <span class="text-xs text-gray-400 italic">
                                     No modules assigned
                                 </span>
                             @else
                                 <div class="flex flex-wrap gap-2">
-                                    @foreach($teacher->modules as $module)
+                                    @foreach($teacher->taughtModules as $module)
                                         <span class="px-3 py-1 rounded-full
                                                      bg-emerald-100 text-emerald-700
                                                      text-xs font-semibold">
@@ -73,11 +73,15 @@
                             @endif
                         </td>
 
+                        {{-- ACTIONS --}}
                         <td class="px-6 py-4 text-right">
                             <form method="POST"
-                                  action="#"
+                                  action="{{ route('admin.teachers.destroy', $teacher) }}"
+                                  onsubmit="return confirm('Remove this teacher?')"
                                   class="inline">
                                 @csrf
+                                @method('DELETE')
+
                                 <button class="px-4 py-1 rounded-lg
                                                bg-red-100 text-red-600
                                                font-semibold hover:bg-red-200">
@@ -86,7 +90,13 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-6 text-center text-gray-500">
+                            No teachers found.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

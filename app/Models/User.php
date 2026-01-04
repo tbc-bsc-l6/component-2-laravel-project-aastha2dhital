@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -22,31 +24,37 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+     | ROLE
+     |========================== */
 
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(UserRole::class, 'user_role_id');
     }
 
+    /* ==========================
+     | STUDENT ↔ MODULES
+     |========================== */
+
     /**
-     * Modules student is/was enrolled in
+     * All modules the student is/was enrolled in
      */
-    public function modules()
+    public function modules(): BelongsToMany
     {
         return $this->belongsToMany(Module::class)
-            ->withPivot(['pass_status', 'completed_at'])
+            ->withPivot([
+                'enrolled_at',
+                'completed_at',
+                'pass_status',
+            ])
             ->withTimestamps();
     }
 
     /**
      * ACTIVE modules (current student)
      */
-    public function activeModules()
+    public function activeModules(): BelongsToMany
     {
         return $this->modules()
             ->wherePivotNull('completed_at');
@@ -55,17 +63,26 @@ class User extends Authenticatable
     /**
      * COMPLETED modules (old student / history)
      */
-    public function completedModules()
+    public function completedModules(): BelongsToMany
     {
         return $this->modules()
             ->wherePivotNotNull('completed_at');
     }
 
+    /* ==========================
+     | TEACHER ↔ MODULES
+     |========================== */
+
     /**
-     * Modules taught by teacher
+     * Modules taught by the teacher
      */
-    public function taughtModules()
+    public function taughtModules(): BelongsToMany
     {
-        return $this->hasMany(Module::class, 'teacher_id');
+        return $this->belongsToMany(
+            Module::class,
+            'module_teacher',
+            'user_id',
+            'module_id'
+        );
     }
 }

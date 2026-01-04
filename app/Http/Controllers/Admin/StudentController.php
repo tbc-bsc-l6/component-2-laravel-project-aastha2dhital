@@ -9,13 +9,13 @@ class StudentController extends Controller
 {
     /**
      * CURRENT students
-     * (students who have at least one active module)
+     * Students who have at least ONE active module
      */
     public function index()
     {
         $students = User::with([
                 'role',
-                'modules' => function ($q) {
+                'activeModules' => function ($q) {
                     $q->withPivot([
                         'enrolled_at',
                         'completed_at',
@@ -23,12 +23,10 @@ class StudentController extends Controller
                     ]);
                 },
             ])
-            ->whereHas('role', function ($q) {
-                $q->where('role', 'student');
-            })
-            ->whereHas('modules', function ($q) {
-                $q->whereNull('module_user.completed_at');
-            })
+            ->whereHas('role', fn ($q) =>
+                $q->where('role', 'student')
+            )
+            ->whereHas('activeModules')
             ->orderBy('name')
             ->get();
 
@@ -37,13 +35,13 @@ class StudentController extends Controller
 
     /**
      * OLD students
-     * (students who have NO active modules, but DO have history)
+     * Students who have NO active modules but DO have completed modules
      */
     public function oldStudents()
     {
         $students = User::with([
                 'role',
-                'modules' => function ($q) {
+                'completedModules' => function ($q) {
                     $q->withPivot([
                         'enrolled_at',
                         'completed_at',
@@ -51,13 +49,11 @@ class StudentController extends Controller
                     ]);
                 },
             ])
-            ->whereHas('role', function ($q) {
-                $q->where('role', 'student');
-            })
-            ->whereDoesntHave('modules', function ($q) {
-                $q->whereNull('module_user.completed_at');
-            })
-            ->whereHas('modules') // must have at least one completed module
+            ->whereHas('role', fn ($q) =>
+                $q->where('role', 'student')
+            )
+            ->whereDoesntHave('activeModules')
+            ->whereHas('completedModules')
             ->orderBy('name')
             ->get();
 
@@ -70,7 +66,7 @@ class StudentController extends Controller
     public function destroy(User $user)
     {
         if ($user->role->role === 'admin') {
-            abort(403);
+            abort(403, 'Admin accounts cannot be removed.');
         }
 
         $user->delete();
