@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'School Management System') }} - {{ $title }}</title>
+    <title>{{ config('app.name', 'Educational Admmin Site') }} - {{ $title }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -22,8 +22,7 @@
                     A
                 </div>
                 <div>
-                    <div class="font-black text-slate-900 leading-tight">Admin Panel</div>
-                    <div class="text-xs text-slate-500 -mt-0.5">School Management System</div>
+                    <div class="font-black text-slate-900 leading-tight">Admin Dashboard </div>
                 </div>
             </div>
 
@@ -77,7 +76,7 @@
         <header class="topbar">
             <div class="relative z-10 flex items-center justify-between gap-4">
                 <div>
-                    <div class="text-white text-2xl font-black tracking-tight">School Management System</div>
+                    <div class="text-white text-2xl font-black tracking-tight">Educational Admin Site</div>
                     <div class="text-white/85 text-sm font-semibold -mt-0.5">Administrator Dashboard</div>
                 </div>
 
