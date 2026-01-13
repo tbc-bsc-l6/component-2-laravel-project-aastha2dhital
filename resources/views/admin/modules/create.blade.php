@@ -1,102 +1,69 @@
-<x-admin-layout>
+<x-admin-layout title="Create Module">
 
-    {{-- ================= PAGE HEADER ================= --}}
-    <div class="mb-10 rounded-3xl
-                bg-gradient-to-r from-emerald-500 to-teal-400
-                px-10 py-8 text-white shadow-xl">
+    <div class="max-w-4xl mx-auto space-y-6">
 
-        <h1 class="text-3xl font-bold flex items-center gap-3">
-            ➕ Create Module
-        </h1>
+        {{-- Header --}}
+        <div class="card-strong p-10 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(34,211,238,.45) 0%, transparent 60%);"></div>
 
-        <p class="mt-2 text-white/90 text-sm max-w-2xl">
-            Add a new academic module to the system. Modules can later be activated,
-            assigned to teachers, and enrolled by students.
-        </p>
-    </div>
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(99,102,241,.35) 0%, transparent 60%);"></div>
 
-    {{-- ================= FORM CARD ================= --}}
-    <form method="POST"
-          action="{{ route('admin.modules.store') }}"
-          class="max-w-3xl">
-
-        @csrf
-
-        <div class="bg-white rounded-2xl
-                    shadow-lg border border-gray-200
-                    relative overflow-hidden">
-
-            {{-- Accent strip --}}
-            <div class="absolute inset-x-0 top-0 h-1
-                        bg-gradient-to-r from-emerald-500 to-teal-400"></div>
-
-            {{-- CARD HEADER --}}
-            <div class="px-8 pt-6 pb-4 border-b">
-                <h2 class="text-xl font-semibold text-gray-800">
-                    Module Details
-                </h2>
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                    Create Module
+                </h1>
+                <p class="text-slate-600 text-sm md:text-base mt-2 font-medium max-w-2xl">
+                    Add a new academic module. You can later assign teachers, toggle availability, and archive it.
+                </p>
             </div>
+        </div>
 
-            {{-- CARD BODY --}}
-            <div class="px-8 py-6 space-y-6">
+        {{-- Form Card --}}
+        <form method="POST" action="{{ route('admin.modules.store') }}">
+            @csrf
+
+            <div class="card p-8 space-y-6">
 
                 <div>
-                    <label for="module"
-                           class="block text-sm font-semibold
-                                  text-gray-700 mb-1">
+                    <label for="module" class="block text-sm font-bold text-slate-800 mb-2">
                         Module Name
                     </label>
 
-                    <input type="text"
-                           id="module"
-                           name="module"
-                           value="{{ old('module') }}"
-                           required
-                           class="w-full rounded-xl
-                                  border border-gray-300
-                                  px-4 py-3 text-sm
-                                  focus:outline-none focus:ring-2
-                                  focus:ring-emerald-500
-                                  focus:border-emerald-500
-                                  transition">
+                    <input
+                        type="text"
+                        id="module"
+                        name="module"
+                        value="{{ old('module') }}"
+                        required
+                        class="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm
+                               focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-300 transition"
+                      
+                    >
 
-                    <p class="mt-2 text-xs text-gray-500">
-                        This name will be visible to students and teachers
+                    <p class="mt-2 text-xs text-slate-500 font-medium">
+                        This name will be visible to students and teachers.
                     </p>
 
                     @error('module')
-                        <p class="mt-2 text-sm text-red-600">
-                            {{ $message }}
-                        </p>
+                        <p class="mt-2 text-sm text-rose-600 font-semibold">{{ $message }}</p>
                     @enderror
                 </div>
 
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200/70">
+                    <a href="{{ route('admin.modules.index') }}" class="btn-ghost">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn-brand">
+                        Create Module
+                    </button>
+                </div>
+
             </div>
+        </form>
 
-            {{-- CARD FOOTER --}}
-            <div class="flex justify-end gap-3 px-8 py-4
-                        border-t bg-gray-50">
-
-                <a href="{{ route('admin.modules.index') }}"
-                   class="rounded-lg px-4 py-2
-                          text-sm font-semibold
-                          text-gray-700 bg-white
-                          border border-gray-300
-                          hover:bg-gray-100 transition">
-                    Cancel
-                </a>
-
-                <button type="submit"
-                        class="rounded-lg px-6 py-2
-                               text-sm font-semibold text-white
-                               bg-emerald-600
-                               hover:bg-emerald-700
-                               transition shadow-sm">
-                    Create Module
-                </button>
-            </div>
-
-        </div>
-    </form>
+    </div>
 
 </x-admin-layout>

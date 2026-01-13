@@ -1,70 +1,62 @@
-<x-admin-layout>
+<x-admin-layout title="Teachers">
 
-    {{-- ================= HEADER ================= --}}
-    <div class="mb-8 flex items-center justify-between
-                rounded-3xl px-10 py-7
-                bg-gradient-to-r from-emerald-400 to-teal-300
-                text-white shadow-xl">
+    <div class="max-w-7xl mx-auto space-y-6">
 
-        <div>
-            <h1 class="text-2xl font-bold flex items-center gap-3">
-                👨‍🏫 Teachers
-            </h1>
-            <p class="text-white/90 text-sm mt-1">
-                Manage teachers and view assigned modules
-            </p>
+        {{-- Big fancy page header --}}
+        <div class="card-strong p-10 relative overflow-hidden flex items-center justify-between gap-6">
+            <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(34,211,238,.45) 0%, transparent 60%);"></div>
+
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(99,102,241,.35) 0%, transparent 60%);"></div>
+
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Teachers</h1>
+                <p class="text-slate-600 text-sm md:text-base mt-2 font-medium">
+                    Manage teachers and view assigned modules
+                </p>
+            </div>
+
+            <div class="relative z-10 shrink-0">
+                <a href="{{ url('/admin/teachers/create') }}" class="btn-brand">
+                    Add Teacher
+                </a>
+            </div>
         </div>
 
-        {{-- ADD TEACHER --}}
-        <a href="{{ url('/admin/teachers/create') }}"
-           class="inline-flex items-center gap-2
-                  rounded-xl bg-white px-6 py-3
-                  text-sm font-bold text-emerald-700
-                  shadow hover:bg-emerald-50 transition">
-            ➕ Add Teacher
-        </a>
-    </div>
-
-    {{-- ================= TABLE ================= --}}
-    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-
-        <table class="w-full text-sm">
-            <thead class="bg-slate-100 text-gray-700">
+        {{-- Table --}}
+        <div class="table-card overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="table-head">
                 <tr>
-                    <th class="px-6 py-3 text-left w-48">Name</th>
-                    <th class="px-6 py-3 text-left w-64">Email</th>
-                    <th class="px-6 py-3 text-left">Assigned Modules</th>
-                    <th class="px-6 py-3 text-right w-40">Assigned Date</th>
-                    <th class="px-6 py-3 text-right w-32">Actions</th>
+                    <th class="px-6 py-4 text-left w-48 font-bold">Name</th>
+                    <th class="px-6 py-4 text-left w-64 font-bold">Email</th>
+                    <th class="px-6 py-4 text-left font-bold">Assigned Modules</th>
+                    <th class="px-6 py-4 text-right w-40 font-bold">Assigned Date</th>
+                    <th class="px-6 py-4 text-right w-32 font-bold">Actions</th>
                 </tr>
-            </thead>
+                </thead>
 
-            <tbody class="divide-y">
+                <tbody class="divide-y divide-slate-200/70 bg-white/40">
                 @forelse($teachers as $teacher)
-                    <tr class="hover:bg-slate-50 align-top">
-
-                        {{-- NAME --}}
-                        <td class="px-6 py-4 font-semibold text-gray-800">
+                    <tr class="table-row align-top">
+                        <td class="px-6 py-4 font-semibold text-slate-900">
                             {{ $teacher->name }}
                         </td>
 
-                        {{-- EMAIL --}}
-                        <td class="px-6 py-4 text-gray-600">
+                        <td class="px-6 py-4 text-slate-600 font-medium">
                             {{ $teacher->email }}
                         </td>
 
-                        {{-- MODULES --}}
                         <td class="px-6 py-4">
                             @if($teacher->teachingModules->isEmpty())
-                                <span class="text-xs italic text-gray-400">
+                                <span class="text-xs italic text-slate-400 font-medium">
                                     No modules assigned
                                 </span>
                             @else
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($teacher->teachingModules as $module)
-                                        <span class="rounded-full bg-emerald-100
-                                                     px-3 py-1 text-xs font-semibold
-                                                     text-emerald-700">
+                                        <span class="badge badge-active">
                                             {{ $module->module }}
                                         </span>
                                     @endforeach
@@ -72,12 +64,10 @@
                             @endif
                         </td>
 
-                        {{-- ✅ ASSIGNED DATE = TEACHER CREATED DATE --}}
-                        <td class="px-6 py-4 text-right text-gray-600">
+                        <td class="px-6 py-4 text-right text-slate-600 font-medium">
                             {{ $teacher->created_at?->format('d M Y') ?? '—' }}
                         </td>
 
-                        {{-- ACTIONS --}}
                         <td class="px-6 py-4 text-right">
                             <form method="POST"
                                   action="{{ url('/admin/teachers/' . $teacher->id) }}"
@@ -85,23 +75,22 @@
                                   class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-red-600 hover:underline font-semibold">
-                                    🗑 Remove
+                                <button type="submit" class="text-rose-700 hover:underline font-semibold">
+                                    Remove
                                 </button>
                             </form>
                         </td>
-
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-500 font-medium">
                             No teachers found.
                         </td>
                     </tr>
                 @endforelse
-            </tbody>
-
-        </table>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

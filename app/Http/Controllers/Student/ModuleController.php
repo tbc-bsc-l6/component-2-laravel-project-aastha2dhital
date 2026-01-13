@@ -13,76 +13,57 @@ class ModuleController extends Controller
         $user = auth()->user();
         $search = $request->query('search');
 
-        // Active (not completed)
-        $activeModules = $user->activeModules()->get();
+        // ACTIVE modules (not completed)
+        $activeModules = $user->modules()
+            ->wherePivotNull('completed_at')
+            ->get();
 
-        // Completed (history)
-        $completedModules = $user->completedModules()->get();
+        // COMPLETED modules
+        $completedModules = $user->modules()
+            ->wherePivotNotNull('completed_at')
+            ->get();
 
-        // OLD STUDENT: only show completed
-        if ($activeModules->count() === 0 && $completedModules->count() > 0) {
-            return view('student.modules.index', [
-                'activeModules' => collect(),
-                'availableModules' => collect(),
-                'completedModules' => $completedModules,
-                'search' => $search,
-            ]);
-        }
-
-        // Available modules (exclude already enrolled)
-        $availableModules = Module::whereNotIn(
-                'id',
-                $user->modules()->pluck('modules.id')
-            )
+        // AVAILABLE modules (student can still enrol)
+        $availableModules = Module::query()
+            ->where('is_active', true)
+            ->whereNotIn('id', $user->modules()->pluck('modules.id'))
             ->when($search, function ($q) use ($search) {
                 $q->where('module', 'like', "%{$search}%");
             })
+            ->orderBy('module')
             ->get();
 
         return view('student.modules.index', compact(
             'activeModules',
-            'availableModules',
             'completedModules',
+            'availableModules',
             'search'
         ));
     }
 
     public function enrol(Module $module)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // Max 4 active modules per student
-    if ($user->activeModules()->count() >= 4) {
-        return back()->with(
-            'error',
-            'A student can enrol in a maximum of 4 modules.'
-        );
+        // max 4 active modules
+        if ($user->modules()->wherePivotNull('completed_at')->count() >= 4) {
+            return back()->with('error', 'You can’t enrol in more than 4 active modules.');
+        }
+
+        // max 10 students per module
+        if ($module->students()->wherePivotNull('completed_at')->count() >= 10) {
+            return back()->with('error', 'Module is full.');
+        }
+
+        // prevent duplicate
+        if ($user->modules()->where('module_id', $module->id)->exists()) {
+            return back()->with('error', 'Already enrolled.');
+        }
+
+        $user->modules()->attach($module->id, [
+            'enrolled_at' => now(),
+        ]);
+
+        return back()->with('success', 'Successfully enrolled.');
     }
-
-    // Max 10 active students per module (USING MODEL HELPER ✅)
-    if (! $module->hasAvailableSeat()) {
-        return back()->with(
-            'error',
-            'This module already has the maximum of 10 students.'
-        );
-    }
-
-    // Prevent duplicate enrolment
-    if ($user->modules()->where('module_id', $module->id)->exists()) {
-        return back()->with(
-            'error',
-            'You are already enrolled in this module.'
-        );
-    }
-
-    // Enrol student
-    $user->modules()->attach($module->id, [
-        'enrolled_at' => now(),
-    ]);
-
-    return back()->with(
-        'success',
-        'Successfully enrolled in the module.'
-    );
-}
 }

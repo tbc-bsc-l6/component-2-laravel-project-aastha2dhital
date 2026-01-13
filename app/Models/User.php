@@ -33,27 +33,13 @@ class User extends Authenticatable
         return $this->belongsTo(UserRole::class, 'user_role_id');
     }
 
-    /* ==========================
-     | STUDENT ↔ MODULES
-     |========================== */
-
-    /**
-     * All modules the student is/was enrolled in
-     */
-    public function modules(): BelongsToMany
+    public function modules()
     {
-        return $this->belongsToMany(Module::class)
-            ->withPivot([
-                'enrolled_at',
-                'completed_at',
-                'pass_status',
-            ])
-            ->withTimestamps();
+    return $this->belongsToMany(\App\Models\Module::class)
+        ->withPivot(['enrolled_at', 'completed_at', 'pass_status'])
+        ->withTimestamps();
     }
-
-    /**
-     * ACTIVE modules (current student)
-     */
+    
     public function activeModules(): BelongsToMany
     {
         return $this->modules()

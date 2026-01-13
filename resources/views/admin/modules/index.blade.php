@@ -1,146 +1,109 @@
-<x-admin-layout>
+<x-admin-layout title="Modules">
 
-    {{-- ================= PAGE HEADER ================= --}}
-    <div class="mb-10 flex flex-col gap-6">
+    <div class="max-w-7xl mx-auto space-y-6">
 
-        {{-- Gradient Title (MATCHES OTHER PAGES) --}}
-        <div
-            class="rounded-3xl
-                   bg-gradient-to-r from-emerald-400 to-teal-300
-                   px-10 py-8 text-white shadow-xl">
+        {{-- Big fancy page header --}}
+        <div class="card-strong p-10 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(34,211,238,.45) 0%, transparent 60%);"></div>
 
-            <h1 class="text-3xl font-bold flex items-center gap-3">
-                📚 Academic Modules
-            </h1>
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(99,102,241,.35) 0%, transparent 60%);"></div>
 
-            <p class="mt-2 text-white/90 text-sm max-w-2xl">
-                Manage modules, assign teachers, control availability,
-                archive unused modules, and review student progress.
-            </p>
-        </div>
-
-        {{-- ACTION BAR --}}
-        <div class="flex items-center justify-between">
-
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">
-                    Module List
-                </h2>
-                <p class="text-sm text-gray-600">
-                    All academic modules in the system
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                    Academic Modules
+                </h1>
+                <p class="text-slate-600 text-sm md:text-base mt-2 max-w-2xl font-medium">
+                    Manage modules, assign teachers, control availability, archive modules and review progress.
                 </p>
             </div>
-
-            {{-- ADD MODULE BUTTON (MATCHES HEADER GRADIENT) --}}
-            <a href="{{ route('admin.modules.create') }}"
-               class="
-                    inline-flex items-center gap-2
-                    px-7 py-3
-                    rounded-xl
-                    bg-gradient-to-r from-emerald-400 to-teal-300
-                    text-white
-                    text-sm font-extrabold
-                    shadow-lg
-                    ring-2 ring-emerald-500/30
-                    hover:brightness-110
-                    hover:shadow-xl
-                    transition
-               ">
-                ➕ Add Module
-            </a>
-
         </div>
-    </div>
 
-    {{-- ================= MODULE TABLE CARD ================= --}}
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+        {{-- Title + button row --}}
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-black text-slate-900">Module List</h2>
+                <p class="text-sm text-slate-500 font-medium">All academic modules in the system</p>
+            </div>
 
-        <table class="w-full text-sm">
-            <thead class="bg-slate-100 text-gray-600">
+            <a href="{{ route('admin.modules.create') }}" class="btn-brand">
+                Add Module
+            </a>
+        </div>
+
+        {{-- Table --}}
+        <div class="table-card">
+            <table class="w-full text-sm">
+                <thead class="table-head">
                 <tr>
-                    <th class="px-8 py-4 text-left font-semibold">Module</th>
-                    <th class="px-6 py-4 text-left font-semibold">Status</th>
-                    <th class="px-8 py-4 text-right font-semibold">Actions</th>
+                    <th class="px-8 py-4 text-left font-bold">Module</th>
+                    <th class="px-6 py-4 text-left font-bold">Status</th>
+                    <th class="px-8 py-4 text-right font-bold">Actions</th>
                 </tr>
-            </thead>
+                </thead>
 
-            <tbody class="divide-y">
-
+                <tbody class="divide-y divide-slate-200/70 bg-white/40">
                 @forelse($modules as $module)
-                    <tr class="hover:bg-slate-50 transition">
-
-                        {{-- MODULE NAME --}}
-                        <td class="px-8 py-4 font-medium text-gray-800">
+                    <tr class="table-row">
+                        <td class="px-8 py-4 font-semibold text-slate-900">
                             {{ $module->module }}
                         </td>
 
-                        {{-- STATUS --}}
                         <td class="px-6 py-4">
                             @if($module->isArchived())
-                                <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-                                    Archived
-                                </span>
+                                <span class="badge badge-archived">Archived</span>
                             @elseif($module->is_active)
-                                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                    Active
-                                </span>
+                                <span class="badge badge-active">Active</span>
                             @else
-                                <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
-                                    Inactive
-                                </span>
+                                <span class="badge badge-inactive">Inactive</span>
                             @endif
                         </td>
 
-                        {{-- ACTIONS --}}
                         <td class="px-8 py-4 text-right">
-                            <div class="inline-flex items-center gap-4 font-semibold">
+                            <div class="inline-flex flex-wrap items-center justify-end gap-x-4 gap-y-2 font-semibold">
 
                                 <a href="{{ route('admin.modules.edit', $module) }}"
-                                   class="text-emerald-600 hover:underline">
-                                    ✏️ Edit
+                                   class="text-sky-700 hover:underline">
+                                    Edit
                                 </a>
 
                                 <a href="{{ route('admin.modules.students', $module) }}"
-                                   class="text-indigo-600 hover:underline">
-                                    👥 Students
+                                   class="text-indigo-700 hover:underline">
+                                    Students
                                 </a>
 
                                 @if(! $module->isArchived())
-                                    <form method="POST"
-                                          action="{{ route('admin.modules.toggle', $module) }}"
-                                          class="inline">
+                                    <form method="POST" action="{{ route('admin.modules.toggle', $module) }}" class="inline">
                                         @csrf
                                         @method('PATCH')
-                                        <button class="text-blue-600 hover:underline">
-                                            🔁 Toggle
+                                        <button type="submit" class="text-blue-700 hover:underline">
+                                            Toggle
                                         </button>
                                     </form>
                                 @endif
 
-                                <form method="POST"
-                                      action="{{ route('admin.modules.archive', $module) }}"
-                                      class="inline">
+                                <form method="POST" action="{{ route('admin.modules.archive', $module) }}" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button class="text-red-600 hover:underline">
-                                        {{ $module->isArchived() ? '♻ Restore' : '📦 Archive' }}
+                                    <button type="submit" class="text-rose-700 hover:underline">
+                                        {{ $module->isArchived() ? 'Restore' : 'Archive' }}
                                     </button>
                                 </form>
 
                             </div>
                         </td>
-
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-8 py-10 text-center text-gray-500">
+                        <td colspan="3" class="px-8 py-12 text-center text-slate-500 font-medium">
                             No modules found.
                         </td>
                     </tr>
                 @endforelse
-
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

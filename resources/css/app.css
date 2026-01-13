@@ -2,79 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================= STUDENT DASHBOARD THEME ================= */
+@layer components {
+  /* =========================
+     APP BACKGROUND (LIGHT, SOOTHING)
+     ========================= */
+  .page-canvas {
+    @apply min-h-screen text-slate-900;
+    background:
+      radial-gradient(900px circle at 12% 12%, rgba(34, 211, 238, .28), transparent 62%),
+      radial-gradient(1000px circle at 86% 18%, rgba(99, 102, 241, .22), transparent 60%),
+      radial-gradient(1100px circle at 50% 110%, rgba(14, 165, 233, .20), transparent 62%),
+      linear-gradient(180deg, #f6fbff 0%, #eef6ff 35%, #f8fbff 100%);
+  }
 
-.student-gradient {
-    background: linear-gradient(
-        180deg,
-        #0CCDA3 0%,
-        #C1FCD3 100%
-    );
-}
+  /* =========================
+     SURFACES
+     ========================= */
+  .card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/70 rounded-3xl shadow-soft;
+  }
 
-/* Clean white cards with accent */
-.student-card {
-    background: #ffffff;
-    border-radius: 1rem;
-    border: 1px solid rgba(236, 64, 122, 0.25);
-}
+  .card-strong {
+    @apply bg-white/90 backdrop-blur-xl border border-white/80 rounded-3xl shadow-soft;
+  }
 
-.student-card-accent {
-    border-left: 6px solid #EC407A;
-}
+  /* =========================
+     TOPBAR (BIGGER + FANCY)
+     ========================= */
+  .topbar {
+    @apply relative overflow-hidden rounded-3xl px-8 py-6 shadow-brand;
+    background-image: linear-gradient(110deg, #0ea5e9 0%, #22d3ee 38%, #6366f1 95%);
+  }
 
-/* ================= STUDENT UI POLISH ================= */
+  .topbar::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background:
+      radial-gradient(900px circle at 25% 0%, rgba(255,255,255,.35), transparent 55%),
+      radial-gradient(900px circle at 75% 0%, rgba(255,255,255,.22), transparent 55%);
+    pointer-events: none;
+  }
 
-/* Header */
-.student-header {
-    padding: 3rem 3.5rem;
-    border-radius: 1.75rem;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
-}
+  /* =========================
+     BUTTONS
+     ========================= */
+  .btn-brand {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-extrabold text-white shadow-brand transition;
+    background-image: linear-gradient(110deg, #0ea5e9 0%, #22d3ee 40%, #6366f1 95%);
+  }
+  .btn-brand:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
-/* Cards */
-.student-card {
-    background: linear-gradient(
-        180deg,
-        rgba(12, 205, 163, 0.08) 0%,
-        rgba(193, 252, 211, 0.25) 100%
-    );
-    border-radius: 1.25rem;
-    border: 1px solid rgba(12, 205, 163, 0.25);
-    padding: 1.1rem 1.25rem;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
-}
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold
+           bg-white/70 text-slate-800 ring-1 ring-slate-200 hover:bg-white/90 transition;
+  }
 
-/* Hover effect */
-.student-card:hover {
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-}
+  /* =========================
+     SIDEBAR
+     ========================= */
+  .sidebar {
+    @apply card h-full flex flex-col p-5;
+  }
 
-/* Card title */
-.student-card h3 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 0.6rem;
-    color: #0f172a;
-}
+  .nav-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-700 transition;
+  }
+  .nav-link:hover { @apply bg-sky-50/80; }
 
-/* Status badge */
-.student-card span {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.55rem;
-    border-radius: 9999px;
-}
+  .nav-active {
+    @apply text-white shadow-brand;
+    background-image: linear-gradient(110deg, #0ea5e9 0%, #22d3ee 40%, #6366f1 95%);
+  }
 
-/* Small enroll button */
-.student-enroll-btn {
-    padding: 0.35rem 0.9rem;
-    font-size: 0.75rem;
-    border-radius: 9999px;
-}
-
-/* ===== PRIMARY GRADIENT (Teacher + Student) ===== */
-.gradient-primary {
-    background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+  .nav-icon {
+    @apply h-9 w-9 rounded-xl flex items-center justify-center font-extrabold;
+    background-image: linear-gradient(110deg, #0ea5e9 0%, #22d3ee 40%, #6366f1 95%);
     color: white;
+    box-shadow: 0 14px 30px rgba(2, 132, 199, .22);
+  }
+
+  /* =========================
+     DASHBOARD TILES
+     (NOTE: do NOT @apply group)
+     ========================= */
+  .tile {
+    @apply card p-7 text-center transition;
+  }
+  .tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 26px 80px rgba(2, 132, 199, .18);
+    border-color: rgba(255,255,255,.9);
+  }
+
+  .tile-icon {
+    @apply mx-auto h-16 w-16 rounded-2xl flex items-center justify-center text-white transition;
+    background-image: linear-gradient(110deg, #0ea5e9 0%, #22d3ee 45%, #6366f1 95%);
+    box-shadow: 0 18px 40px rgba(2, 132, 199, .22);
+  }
+  .tile:hover .tile-icon { transform: scale(1.06); }
+
+  /* =========================
+     TABLE CARD
+     ========================= */
+  .table-card {
+    @apply card overflow-hidden;
+  }
+
+  .table-head {
+    @apply bg-sky-50/80 text-slate-700;
+  }
+
+  .table-row {
+    @apply hover:bg-sky-50/60 transition;
+  }
+
+  /* =========================
+     BADGES
+     ========================= */
+  .badge {
+  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold;
+}
+.badge-active { @apply bg-emerald-100 text-emerald-700; }
+.badge-inactive { @apply bg-amber-100 text-amber-700; }
+.badge-warn { @apply bg-sky-100 text-sky-700; }
+.badge-bad { @apply bg-rose-100 text-rose-700; }
+.badge-archived { @apply bg-slate-200 text-slate-700; }
 }

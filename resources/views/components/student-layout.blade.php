@@ -13,10 +13,11 @@
 <div class="min-h-screen flex">
 
     <!-- ================= SIDEBAR ================= -->
-    <aside class="w-64 student-gradient text-white flex flex-col shadow-2xl">
+    <aside class="w-64 bg-gradient-to-b from-sky-600 via-sky-700 to-slate-900
+                  text-white flex flex-col shadow-2xl">
 
         <!-- LOGO -->
-        <div class="px-6 py-7 text-xl font-extrabold tracking-wide border-b border-white/25">
+        <div class="px-6 py-7 text-xl font-extrabold tracking-wide border-b border-white/20">
             🎓 Student Panel
         </div>
 
@@ -38,7 +39,7 @@
         </nav>
 
         <!-- LOGOUT -->
-        <div class="p-4 border-t border-white/25">
+        <div class="p-4 border-t border-white/20">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button
@@ -51,23 +52,8 @@
     </aside>
 
     <!-- ================= MAIN CONTENT ================= -->
-    <main class="flex-1 px-10 py-10">
-
-        <!-- HERO HEADER -->
-        <div class="mb-10 student-gradient student-header text-white">
-            <h1 class="text-3xl font-extrabold tracking-wide">
-                👋 Hello, {{ auth()->user()->name }}
-            </h1>
-
-            <p class="text-white/90 mt-2 max-w-2xl">
-                Welcome back! Browse your available modules, track completed courses,
-                and manage your academic journey from here.
-            </p>
-        </div>
-
-        <!-- PAGE CONTENT -->
+    <main class="flex-1 px-10 py-10 bg-[#F5F7FB]">
         {{ $slot }}
-
     </main>
 
 </div>

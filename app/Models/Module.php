@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\User; // ✅ MISSING IMPORT (FIXED)
+use App\Models\User; 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -42,27 +42,13 @@ class Module extends Model
     /**
      * Students enrolled in this module
      */
-    public function students(): BelongsToMany
+    public function students()
     {
-        return $this->belongsToMany(
-            User::class,
-            'module_user',
-            'module_id',
-            'user_id'
-        )->withPivot([
-            'enrolled_at',
-            'completed_at',
-            'pass_status',
-        ])->withTimestamps();
+    return $this->belongsToMany(User::class)
+        ->withPivot('enrolled_at', 'completed_at', 'pass_status')
+        ->withTimestamps();
     }
 
-    /* ============================
-     | Helpers (IMPORTANT)
-     |============================ */
-
-    /**
-     * Is module archived?
-     */
     public function isArchived(): bool
     {
         return ! is_null($this->archived_at);

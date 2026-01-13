@@ -1,105 +1,77 @@
-<x-admin-layout>
+<x-admin-layout title="Assign Teachers">
 
-    {{-- ================= HEADER ================= --}}
-    <div class="mb-10 rounded-3xl
-                bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400
-                px-10 py-8 text-white shadow-xl">
+    <div class="max-w-4xl mx-auto space-y-6">
 
-        <h1 class="text-3xl font-bold flex items-center gap-3">
-            🧑‍🏫 Assign Teachers
-        </h1>
+        {{-- Header --}}
+        <div class="card-strong p-10 relative overflow-hidden flex items-center justify-between gap-6">
+            <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(34,211,238,.45) 0%, transparent 60%);"></div>
 
-        <p class="mt-2 text-white/90 text-sm max-w-2xl">
-            Assign or remove teachers responsible for this module.
-        </p>
-    </div>
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(99,102,241,.35) 0%, transparent 60%);"></div>
 
-    {{-- ================= CARD ================= --}}
-    <div class="max-w-3xl bg-white rounded-3xl shadow-lg border border-slate-100">
-
-        {{-- TOP BAR --}}
-        <div class="flex items-center justify-between
-                    px-8 py-5 border-b bg-slate-50 rounded-t-3xl">
-
-            <div>
-                <h2 class="text-lg font-semibold text-gray-800">
-                    Module: {{ $module->module }}
-                </h2>
-                <p class="text-sm text-gray-500">
-                    Select teachers assigned to this module
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                    Assign Teachers
+                </h1>
+                <p class="text-slate-600 text-sm md:text-base mt-2 font-medium">
+                    Module: <span class="font-semibold text-slate-900">{{ $module->module }}</span>
                 </p>
             </div>
 
-            {{-- BACK BUTTON --}}
-            <a href="{{ route('admin.modules.index') }}"
-               class="rounded-xl border border-gray-300
-                      px-4 py-2 text-sm font-semibold text-gray-700
-                      hover:bg-gray-100 transition">
-                ← Back
-            </a>
+            <div class="relative z-10 shrink-0">
+                <a href="{{ route('admin.modules.index') }}" class="btn-ghost">
+                    Back
+                </a>
+            </div>
         </div>
 
-        {{-- ================= FORM ================= --}}
-        <form method="POST"
-              action="{{ route('admin.modules.update', $module) }}"
-              class="px-8 py-6 space-y-6">
+        {{-- Form Card --}}
+        <div class="card p-8">
+            <form method="POST" action="{{ route('admin.modules.update', $module) }}" class="space-y-6">
+                @csrf
+                @method('PUT')
 
-            @csrf
-            @method('PUT')
+                <div>
+                    <label class="block text-sm font-black text-slate-900 mb-2">
+                        Available Teachers
+                    </label>
+                    <p class="text-sm text-slate-500 font-medium mb-4">
+                        Select teachers who will teach this module.
+                    </p>
 
-            {{-- TEACHERS LIST --}}
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-3">
-                    Available Teachers
-                </label>
-
-                <div class="grid sm:grid-cols-2 gap-4">
-                    @foreach($teachers as $teacher)
-                        <label
-                            class="flex items-center gap-3 rounded-xl border
-                                   px-4 py-3 cursor-pointer
-                                   hover:bg-slate-50 transition">
-
-                            <input
-                                type="checkbox"
-                                name="teachers[]"
-                                value="{{ $teacher->id }}"
-                                @checked($module->teachers->contains($teacher))
-                                class="h-4 w-4 text-emerald-500
-                                       focus:ring-emerald-400 rounded">
-
-                            <div>
-                                <p class="font-medium text-gray-800">
-                                    {{ $teacher->name }}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {{ $teacher->email }}
-                                </p>
-                            </div>
-                        </label>
-                    @endforeach
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        @foreach($teachers as $teacher)
+                            <label class="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/70 backdrop-blur px-4 py-4 cursor-pointer hover:bg-white/90 transition">
+                                <input
+                                    type="checkbox"
+                                    name="teachers[]"
+                                    value="{{ $teacher->id }}"
+                                    @checked($module->teachers->contains($teacher))
+                                    class="mt-1 h-4 w-4 rounded text-sky-600 focus:ring-sky-400"
+                                >
+                                <div class="min-w-0">
+                                    <p class="font-semibold text-slate-900">{{ $teacher->name }}</p>
+                                    <p class="text-xs text-slate-500 font-medium truncate">{{ $teacher->email }}</p>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
 
-            {{-- ACTION BUTTONS --}}
-            <div class="flex items-center justify-end gap-4 pt-4 border-t">
+                <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-200/70">
+                    <a href="{{ route('admin.modules.index') }}" class="btn-ghost">
+                        Cancel
+                    </a>
 
-                <a href="{{ route('admin.modules.index') }}"
-                   class="rounded-xl border border-gray-300
-                          px-5 py-2.5 text-sm font-semibold text-gray-700
-                          hover:bg-gray-100 transition">
-                    Cancel
-                </a>
+                    <button type="submit" class="btn-brand">
+                        Save Changes
+                    </button>
+                </div>
 
-                <button
-                    class="rounded-xl bg-emerald-500
-                           px-6 py-2.5 text-sm font-semibold text-white
-                           shadow hover:bg-emerald-600 transition">
-                    💾 Save Changes
-                </button>
-            </div>
+            </form>
+        </div>
 
-        </form>
     </div>
 
 </x-admin-layout>

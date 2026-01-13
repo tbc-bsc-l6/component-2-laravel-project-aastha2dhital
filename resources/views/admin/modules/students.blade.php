@@ -1,111 +1,109 @@
-<x-admin-layout>
+<x-admin-layout title="Module Students">
 
-    {{-- HEADER --}}
-    <div class="mb-8 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 px-8 py-6 text-white shadow">
-        <h1 class="text-2xl font-bold">
-            👥 Students — {{ $module->module }}
-        </h1>
-        <p class="text-sm text-white/90">
-            View enrolled students and pass / fail status
-        </p>
-    </div>
+    <div class="max-w-7xl mx-auto space-y-6">
 
-    {{-- CARD --}}
-    <div class="bg-white rounded-2xl shadow border">
+        {{-- Big fancy page header --}}
+        <div class="card-strong p-10 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(34,211,238,.45) 0%, transparent 60%);"></div>
 
-        <div class="px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold text-gray-800">
-                Enrolled Students
-            </h2>
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-60"
+                 style="background: radial-gradient(circle, rgba(99,102,241,.35) 0%, transparent 60%);"></div>
+
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+                    Students — {{ $module->module }}
+                </h1>
+                <p class="text-slate-600 text-sm md:text-base mt-2 font-medium">
+                    View enrolled students and pass / fail status
+                </p>
+            </div>
         </div>
 
-        <div class="overflow-x-auto">
+        {{-- Table --}}
+        <div class="table-card overflow-hidden">
             <table class="w-full text-sm">
-                <thead class="bg-slate-50 text-gray-600">
-                    <tr>
-                        <th class="px-6 py-3 text-left">Student</th>
-                        <th class="px-6 py-3 text-left">Email</th>
-                        <th class="px-6 py-3 text-left">Enrolled On</th>
-                        <th class="px-6 py-3 text-left">Status</th>
-                        <th class="px-6 py-3 text-left">Result</th>
-                        <th class="px-6 py-3 text-right">Action</th>
-                    </tr>
+                <thead class="table-head">
+                <tr>
+                    <th class="px-6 py-4 text-left font-bold">Student</th>
+                    <th class="px-6 py-4 text-left font-bold">Email</th>
+                    <th class="px-6 py-4 text-left font-bold">Enrolled On</th>
+                    <th class="px-6 py-4 text-left font-bold">Status</th>
+                    <th class="px-6 py-4 text-left font-bold">Result</th>
+                    <th class="px-6 py-4 text-right font-bold">Action</th>
+                </tr>
                 </thead>
 
-                <tbody class="divide-y">
-                    @forelse($students as $student)
-                        <tr class="hover:bg-slate-50">
+                <tbody class="divide-y divide-slate-200/70 bg-white/40">
+                @forelse($students as $student)
+                    <tr class="table-row align-top">
 
-                            <td class="px-6 py-4 font-medium">
-                                {{ $student->name }}
-                            </td>
+                        <td class="px-6 py-4 font-semibold text-slate-900">
+                            {{ $student->name }}
+                        </td>
 
-                            <td class="px-6 py-4 text-gray-600">
-                                {{ $student->email }}
-                            </td>
+                        <td class="px-6 py-4 text-slate-600 font-medium">
+                            {{ $student->email }}
+                        </td>
 
-                            <td class="px-6 py-4 text-gray-600"> 
-                                {{ $student->pivot->enrolled_at
-                                    ? \Carbon\Carbon::parse($student->pivot->enrolled_at)->format('d M Y')
-                                    : '—' }}
-                            </td>
+                        <td class="px-6 py-4 text-slate-600 font-medium">
+                            {{ $student->pivot->enrolled_at
+                                ? \Carbon\Carbon::parse($student->pivot->enrolled_at)->format('d M Y')
+                                : '—' }}
+                        </td>
 
+                        {{-- ACTIVE / COMPLETED --}}
+                        <td class="px-6 py-4">
+                            @if($student->pivot->completed_at)
+                                <span class="badge badge-archived">Completed</span>
+                            @else
+                                <span class="badge badge-warn">Active</span>
+                            @endif
+                        </td>
 
-                            {{-- ACTIVE / COMPLETED --}}
-                            <td class="px-6 py-4">
-                                @if($student->pivot->completed_at)
-                                    <span class="text-xs px-3 py-1 rounded-full bg-gray-200">
-                                        Completed
-                                    </span>
-                                @else
-                                    <span class="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
-                                        Active
-                                    </span>
-                                @endif
-                            </td>
+                        {{-- PASS / FAIL --}}
+                        <td class="px-6 py-4">
+                            @php
+                                $status = strtolower((string)($student->pivot->pass_status ?? ''));
+                            @endphp
 
-                            {{-- PASS / FAIL --}}
-                            <td class="px-6 py-4">
-                                @if($student->pivot->pass_status === 'pass')
-                                    <span class="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
-                                        Pass
-                                    </span>
-                                @elseif($student->pivot->pass_status === 'fail')
-                                    <span class="text-xs px-3 py-1 rounded-full bg-red-100 text-red-700">
-                                        Fail
-                                    </span>
-                                @else
-                                    <span class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
-                                        Pending
-                                    </span>
-                                @endif
-                            </td>
+                            @if($status === 'pass')
+                                <span class="badge badge-active">Pass</span>
+                            @elseif($status === 'fail')
+                                <span class="badge badge-bad">Fail</span>
+                            @else
+                                <span class="badge badge-inactive">Pending</span>
+                            @endif
+                        </td>
 
-                            {{-- REMOVE --}}
-                            <td class="px-6 py-4 text-right">
-                                <form method="POST"
-                                      action="{{ route('admin.modules.students.remove', [$module, $student]) }}"
-                                      onsubmit="return confirm('Remove this student from the module?')">
-                                    @csrf
-                                    @method('DELETE')
+                        {{-- REMOVE --}}
+                        <td class="px-6 py-4 text-right">
+                            <form method="POST"
+                                  action="{{ route('admin.modules.students.remove', [$module, $student]) }}"
+                                  onsubmit="return confirm('Remove this student from the module?')"
+                                  class="inline">
+                                @csrf
+                                @method('DELETE')
 
-                                    <button class="text-red-600 font-semibold hover:underline">
-                                        ❌ Remove
-                                    </button>
-                                </form>
-                            </td>
+                                <button type="submit" class="text-rose-700 hover:underline font-semibold">
+                                    Remove
+                                </button>
+                            </form>
+                        </td>
 
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                No students enrolled in this module.
-                            </td>
-                        </tr>
-                    @endforelse
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-slate-500 font-medium">
+                            No students enrolled in this module.
+                        </td>
+                    </tr>
+                @endforelse
                 </tbody>
+
             </table>
         </div>
+
     </div>
 
 </x-admin-layout>
