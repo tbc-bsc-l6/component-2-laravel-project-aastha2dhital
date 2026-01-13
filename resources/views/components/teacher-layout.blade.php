@@ -1,62 +1,97 @@
+@props(['title' => 'Teacher'])
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <title>Teacher Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config('app.name', 'School Management System') }} - {{ $title }}</title>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+<body class="page-canvas">
+<div class="min-h-screen flex">
 
-<body class="bg-gray-100">
+    {{-- Sidebar --}}
+    <aside class="w-72 p-5">
+        <div class="sidebar">
 
-<div class="flex min-h-screen">
-
-    <!-- SIDEBAR (FIXED, FULL HEIGHT) -->
-    <aside class="fixed left-0 top-0 h-screen w-64">
-        <div class="h-full p-4">
-            <div class="flex h-full flex-col rounded-2xl
-                        bg-gradient-to-b from-emerald-500 to-teal-400
-                        p-4 shadow-xl">
-
-                <!-- BRAND -->
-                <div class="mb-6 flex items-center gap-2 text-white">
-                    <span class="text-xl">🎓</span>
-                    <span class="text-lg font-bold">Teacher Panel</span>
+            <div class="flex items-center gap-3">
+                <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white font-black"
+                     style="background-image: linear-gradient(110deg,#0ea5e9 0%,#22d3ee 38%,#6366f1 95%); box-shadow: 0 18px 45px rgba(2,132,199,.25);">
+                    T
                 </div>
-
-                <!-- NAV -->
-                <nav class="flex-1 space-y-2">
-                    <a href="{{ route('teacher.modules.index') }}"
-                       class="flex items-center gap-2 rounded-xl px-4 py-2
-                              text-sm font-semibold
-                              {{ request()->routeIs('teacher.modules.*')
-                                    ? 'bg-white text-emerald-700'
-                                    : 'text-white hover:bg-white/20' }}">
-                        📘 My Modules
-                    </a>
-                </nav>
-
-                <!-- LOGOUT -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button
-                        class="mt-auto flex w-full items-center gap-2
-                               rounded-xl bg-white/30 px-4 py-2
-                               text-sm font-semibold text-emerald-900
-                               hover:bg-white/50">
-                        🚪 Logout
-                    </button>
-                </form>
-
+                <div>
+                    <div class="font-black text-slate-900 leading-tight">Teacher Panel</div>
+                    <div class="text-xs text-slate-500 -mt-0.5">School Management System</div>
+                </div>
             </div>
+
+            <nav class="mt-8 space-y-2">
+                <a href="{{ route('teacher.modules.index') }}"
+                   class="{{ request()->routeIs('teacher.modules.*') ? 'nav-link nav-active' : 'nav-link' }}">
+                    <span class="nav-icon">M</span>
+                    My Modules
+                </a>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-white/70">
+                <div class="text-xs text-slate-500">Logged in as</div>
+                <div class="font-semibold text-slate-900">{{ auth()->user()->name }}</div>
+
+                <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                    @csrf
+                    <button type="submit" class="btn-ghost w-full">Logout</button>
+                </form>
+            </div>
+
         </div>
     </aside>
 
-    <!-- MAIN CONTENT (SHIFTED RIGHT PROPERLY) -->
-    <main class="ml-64 w-full p-8">
-        {{ $slot }}
-    </main>
+    {{-- Main --}}
+    <div class="flex-1 p-5 pl-0">
+        <header class="topbar">
+            <div class="relative z-10 flex items-center justify-between gap-4">
+                <div>
+                    <div class="text-white text-2xl font-black tracking-tight">School Management System</div>
+                    <div class="text-white/85 text-sm font-semibold -mt-0.5">Teacher Dashboard</div>
+                </div>
 
+                <form method="GET" action="#" class="hidden md:block">
+                    <input type="text" placeholder="Search..."
+                           class="w-72 rounded-2xl border border-white/40 bg-white/20 px-4 py-2.5 text-white placeholder:text-white/70
+                                  focus:outline-none focus:ring-2 focus:ring-white/60" />
+                </form>
+            </div>
+        </header>
+
+        <main class="mt-6">
+            @if (session('success'))
+                <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-900">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+                    <div class="font-semibold mb-1">Please fix the following:</div>
+                    <ul class="list-disc pl-5 space-y-1">
+                        @foreach ($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{ $slot }}
+        </main>
+    </div>
 </div>
-
 </body>
 </html>

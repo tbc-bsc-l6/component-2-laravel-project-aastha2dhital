@@ -12,11 +12,11 @@ class AdminRoleChangeProtectionTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Admin cannot change role of a student who has active modules
+     * Admin can change role and active modules are cleaned up
      */
-    public function test_admin_cannot_change_role_if_student_has_active_modules()
+    public function test_admin_can_change_role_and_active_modules_are_removed()
     {
-        // Seed user roles (foreign key dependency)
+        // Seed roles
         DB::table('user_roles')->insert([
             ['id' => 1, 'role' => 'admin'],
             ['id' => 2, 'role' => 'teacher'],
@@ -24,24 +24,24 @@ class AdminRoleChangeProtectionTest extends TestCase
             ['id' => 4, 'role' => 'old_student'],
         ]);
 
-        // Create admin user
+        // Create admin
         $admin = User::factory()->create([
             'user_role_id' => 1,
         ]);
 
-        // Create student user
+        // Create student
         $student = User::factory()->create([
             'user_role_id' => 3,
         ]);
 
-        // Create a module
+        // Create module
         $moduleId = DB::table('modules')->insertGetId([
             'module'     => 'Active Module',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // Enrol student into module (ACTIVE: completed_at = null)
+        // Enrol student (active module)
         DB::table('module_user')->insert([
             'user_id'     => $student->id,
             'module_id'   => $moduleId,
@@ -53,19 +53,25 @@ class AdminRoleChangeProtectionTest extends TestCase
         // Act as admin
         $this->actingAs($admin);
 
-        // Attempt to change student role to teacher
+        // Change role to old_student
         $response = $this->patch(
             route('admin.students.updateRole', $student),
-            ['role' => 'teacher']
+            ['role' => 'old_student']
         );
 
-        // Should be blocked
+        // Redirect success
         $response->assertStatus(302);
 
-        // Role should remain STUDENT (3)
+        // Role should be updated
         $this->assertEquals(
-            3,
-            DB::table('users')->where('id', $student->id)->value('user_role_id')
+            'old_student',
+            $student->fresh()->role->role
         );
+
+        // Active module should be removed
+        $this->assertDatabaseMissing('module_user', [
+            'user_id'   => $student->id,
+            'module_id'=> $moduleId,
+        ]);
     }
 }

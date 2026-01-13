@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\User; 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,16 +14,13 @@ class Module extends Model
         'module',
         'is_active',
         'archived_at',
+        'teacher_id', // keep this if column exists
     ];
 
     protected $casts = [
         'is_active'   => 'boolean',
         'archived_at' => 'datetime',
     ];
-
-    /* ============================
-     | Relationships
-     |============================ */
 
     /**
      * Teachers assigned to this module
@@ -36,7 +32,7 @@ class Module extends Model
             'module_teacher',
             'module_id',
             'user_id'
-        );
+        )->withTimestamps();
     }
 
     /**
@@ -44,9 +40,9 @@ class Module extends Model
      */
     public function students()
     {
-    return $this->belongsToMany(User::class)
-        ->withPivot('enrolled_at', 'completed_at', 'pass_status')
-        ->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('enrolled_at', 'completed_at', 'pass_status')
+            ->withTimestamps();
     }
 
     public function isArchived(): bool
@@ -54,17 +50,11 @@ class Module extends Model
         return ! is_null($this->archived_at);
     }
 
-    /**
-     * Can students enrol?
-     */
     public function isAvailable(): bool
     {
         return $this->is_active && ! $this->isArchived();
     }
 
-    /**
-     * Count only active (not completed) students
-     */
     public function activeStudentCount(): int
     {
         return $this->students()
@@ -72,9 +62,6 @@ class Module extends Model
             ->count();
     }
 
-    /**
-     * Max capacity = 10 students
-     */
     public function hasAvailableSeat(): bool
     {
         return $this->activeStudentCount() < 10;

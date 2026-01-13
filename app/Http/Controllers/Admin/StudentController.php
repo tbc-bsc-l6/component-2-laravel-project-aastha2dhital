@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
     /**
      * CURRENT STUDENTS
-     * user_role_id = 3 (student)
      */
     public function index()
     {
+        $studentRole = UserRole::where('role', 'student')->first();
+
         $students = User::with([
                 'modules' => function ($q) {
                     $q->withPivot([
@@ -23,7 +25,7 @@ class StudentController extends Controller
                     ]);
                 },
             ])
-            ->where('user_role_id', 3) // student
+            ->where('user_role_id', $studentRole->id)
             ->orderBy('name')
             ->get();
 
@@ -32,10 +34,11 @@ class StudentController extends Controller
 
     /**
      * OLD STUDENTS
-     * user_role_id = 4 (old_student)
      */
     public function oldStudents()
     {
+        $oldStudentRole = UserRole::where('role', 'old_student')->first();
+
         $students = User::with([
                 'completedModules' => function ($q) {
                     $q->withPivot([
@@ -45,7 +48,7 @@ class StudentController extends Controller
                     ]);
                 },
             ])
-            ->where('user_role_id', 4) // old_student
+            ->where('user_role_id', $oldStudentRole->id)
             ->orderBy('name')
             ->get();
 
@@ -53,53 +56,64 @@ class StudentController extends Controller
     }
 
     /**
-     * UPDATE STUDENT ROLE
-     * student (3), teacher (2), old_student (4)
+     * UPDATE USER ROLE (SAFE)
      */
     public function updateRole(Request $request, User $user)
-{
-    $validated = $request->validate([
-        'role' => ['required', 'in:student,teacher,old_student'],
-    ]);
+    {
+        $validated = $request->validate([
+            'role' => ['required', 'exists:user_roles,role'],
+        ]);
 
-  
-    if ($user->id === auth()->id()) {
-        return back()->with('error', 'You cannot change your own role.');
-    }
+        // Prevent self role change
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot change your own role.');
+        }
 
-   
-    $hasActiveModules = $user->modules()
-        ->wherePivotNull('completed_at')
-        ->exists();
+        $currentRole = $user->role->role;
+        $newRole     = $validated['role'];
 
-    if ($hasActiveModules) {
-        return back()->with(
-            'error',
-            'Role cannot be changed while the student has active modules.'
-        );
-    }
+        /*
+         |------------------------------------------------------------
+         | SAFETY CLEANUP BEFORE ROLE CHANGE
+         |------------------------------------------------------------
+         */
 
-    $roleMap = [
-        'admin'       => 1,
-        'teacher'     => 2,
-        'student'     => 3,
-        'old_student' => 4,
-    ];
+        // student → old_student : remove ONLY active modules
+        if ($currentRole === 'student' && $newRole === 'old_student') {
+            $user->modules()
+                ->wherePivotNull('completed_at')
+                ->detach();
+        }
 
-    $user->update([
-        'user_role_id' => $roleMap[$validated['role']],
-    ]);
+        // teacher → anything else : remove teaching assignments
+        if ($currentRole === 'teacher' && $newRole !== 'teacher') {
+            $user->teachingModules()->detach();
+        }
 
-    
-    if ($validated['role'] === 'old_student') {
+        /*
+         |------------------------------------------------------------
+         | UPDATE ROLE
+         |------------------------------------------------------------
+         */
+        $role = UserRole::where('role', $newRole)->first();
+
+        $user->update([
+            'user_role_id' => $role->id,
+        ]);
+
+        /*
+         |------------------------------------------------------------
+         | REDIRECT
+         |------------------------------------------------------------
+         */
+        if ($newRole === 'old_student') {
+            return redirect()
+                ->route('admin.students.old')
+                ->with('success', 'User moved to Old Students successfully.');
+        }
+
         return redirect()
-            ->route('admin.students.old')
-            ->with('success', 'Student moved to Old Students.');
+            ->route('admin.students.index')
+            ->with('success', 'User role updated safely.');
     }
-
-    return redirect()
-        ->route('admin.students.index')
-        ->with('success', 'Student role updated successfully.');
-}
-
 }

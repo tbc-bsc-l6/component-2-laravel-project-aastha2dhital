@@ -24,65 +24,56 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /* ==========================
+    /* ======================
      | ROLE
-     |========================== */
-
+     |====================== */
     public function role(): BelongsTo
     {
         return $this->belongsTo(UserRole::class, 'user_role_id');
     }
 
-    public function modules()
+    /* ======================
+     | STUDENT ↔ MODULES
+     |====================== */
+
+    /**
+     * Modules enrolled by a student
+     * Pivot table: module_user
+     */
+    public function modules(): BelongsToMany
     {
-    return $this->belongsToMany(\App\Models\Module::class)
-        ->withPivot(['enrolled_at', 'completed_at', 'pass_status'])
-        ->withTimestamps();
+        return $this->belongsToMany(Module::class)
+            ->withPivot(['enrolled_at', 'completed_at', 'pass_status'])
+            ->withTimestamps();
     }
-    
+
     public function activeModules(): BelongsToMany
     {
         return $this->modules()
             ->wherePivotNull('completed_at');
     }
 
-    /**
-     * COMPLETED modules (history / old student)
-     */
     public function completedModules(): BelongsToMany
     {
         return $this->modules()
             ->wherePivotNotNull('completed_at');
     }
 
-    /* =================================================
-     | ALIASES (USED BY CONTROLLERS — DO NOT REMOVE)
-     |================================================= */
-
-    /**
-     * Alias for activeModules()
-     * Used by StudentModuleController
-     */
+    /* Aliases used by student controllers */
     public function activeEnrollments(): BelongsToMany
     {
         return $this->activeModules();
     }
 
-    /**
-     * Alias for completedModules()
-     * Used by StudentModuleController
-     */
     public function completedEnrollments(): BelongsToMany
     {
         return $this->completedModules();
     }
 
-    /* ==========================
-     | TEACHER ↔ MODULES
-     |========================== */
 
     /**
-     * Modules taught by the teacher
+     * Modules taught by a teacher
+     * Pivot table: module_teacher
      */
     public function teachingModules(): BelongsToMany
     {
